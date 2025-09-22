@@ -1,3 +1,43 @@
+## 👥 Guía para colaboradores
+
+Este proyecto usa **ramas por persona** para trabajar en paralelo sin romper la rama principal (`main`).
+
+### 1️⃣ Clonar el repositorio
+
+```bash
+git clone git@github.com:Prietosk1/lab-1-ed2.git
+cd lab-1-ed2
+```
+
+### 2️⃣ Cambiarse a su rama personal
+
+Cada colaborador tendrá una rama con su nombre.
+Ejemplo para `juan`:
+
+```bash
+git fetch --all //Comando para traer todas las ramas existentes
+git checkout juan
+```
+
+### 3️⃣ Subir cambios
+
+Haz commits en tu rama y súbelos con:
+
+```bash
+git add .
+git commit -m "feat: agrega nueva funcionalidad"
+git push
+```
+
+### 4️⃣ Traer cambios de la rama principal
+
+Si necesitas actualizar tu rama con lo último de main:
+
+```bash
+git checkout pepito
+git pull origin main
+```
+
 ## Convenciones de Commits
 
 Este proyecto sigue un formato de mensajes de commit inspirado en [Conventional Commits](https://www.conventionalcommits.org/).
