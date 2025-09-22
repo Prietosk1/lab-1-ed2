@@ -18,10 +18,21 @@ Este proyecto sigue un formato de mensajes de commit inspirado en [Conventional 
 
 ### Ejemplos
 
-```feat(auth): agregar login con JWT
+```
+feat(auth): agregar login con JWT
 fix(api): corregir error 500 al enviar formulario
 docs(readme): actualizar instrucciones de instalación
 style: aplicar prettier a archivos .ts y .tsx
 ```
 
 Esto nos ayuda a mantener un historial de cambios **claro y ordenado**.
+
+## 🔧 Extensiones recomendadas (VS Code)
+
+Para mantener una experiencia de desarrollo consistente, recomendamos instalar las siguientes extensiones:
+
+- **Prettier - Code formatter** (`esbenp.prettier-vscode`)
+- **ESLint** (`dbaeumer.vscode-eslint`)
+- **Tailwind CSS IntelliSense** (`bradlc.vscode-tailwindcss`)
+- **Code Spell Checker** (`streetsidesoftware.code-spell-checker`)
+- _(opcional)_ **GitLens** (`eamodio.gitlens`)
