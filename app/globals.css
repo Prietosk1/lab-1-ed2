@@ -3,6 +3,11 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --temp-cold: #3b82f6; /* azul */
+  --temp-cool: #22c55e; /* verde */
+  --temp-warm: #facc15; /* amarillo */
+  --temp-hot: #ef4444; /* rojo */
+  --accent: #8b5cf6; /* morado (para resaltar búsquedas/recorridos) */
 }
 
 @theme inline {
