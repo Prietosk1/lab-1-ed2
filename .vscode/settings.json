@@ -17,5 +17,12 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "cSpell.words": ["logomark", "turbopack"],
-  "cSpell.language": "en,es"
+  "cSpell.language": "en,es",
+  "cSpell.enabledFileTypes": {
+    ".js": true,
+    ".ts": true,
+    ".tsx": true,
+    ".json": true,
+    ".css": true
+  }
 }
