@@ -15,5 +15,7 @@
   },
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "cSpell.words": ["logomark", "turbopack"],
+  "cSpell.language": "en,es"
 }
