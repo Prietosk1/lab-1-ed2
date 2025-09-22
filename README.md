@@ -1,6 +1,70 @@
-## 👥 Guía para colaboradores
+# 👥 Guía para colaboradores
 
 Este proyecto usa **ramas por persona** para trabajar en paralelo sin romper la rama principal (`main`).
+
+## 🔑 Configuración inicial de SSH para GitHub
+
+Para evitar tener que escribir usuario y contraseña cada vez que trabajes con GitHub, se recomienda usar **llaves SSH**.
+
+### 1️⃣ Verificar si ya tienes una llave SSH
+
+En la terminal, ejecuta:
+
+```bash
+ls -al ~/.ssh
+```
+
+Si ves archivos como id_rsa.pub o id_ed25519.pub, ya tienes una clave creada.
+
+### 2️⃣ Crear una nueva llave SSH
+
+Ejecuta:
+
+`ssh-keygen -t ed25519 -C "tu-email@ejemplo.com"`
+
+Presiona Enter en todas las preguntas (puedes dejar la passphrase vacía si prefieres no escribirla cada vez).
+
+Esto generará dos archivos en ~/.ssh/:
+
+- `id_ed25519` (tu clave privada, no la compartas nunca)
+- `id_ed25519.pub` (tu clave pública, esta sí la vas a copiar a GitHub)
+
+### 3️⃣ Iniciar el agente SSH y agregar tu llave
+
+Ejecuta:
+
+```bash
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+```
+
+### 4️⃣ Copiar la llave pública
+
+Ejecuta:
+
+`cat ~/.ssh/id_ed25519.pub`
+
+Copia todo el contenido que aparece.
+
+### 5️⃣ Agregar la clave a GitHub
+
+1. Ve a [GitHub → Settings → SSH and GPG keys](https://github.com/settings/keys)
+2. Haz clic en New SSH key
+3. Pega la clave pública que copiaste.
+
+### 6️⃣ Probar la conexión
+
+Ejecuta:
+
+`ssh -T git@github.com`
+
+Si todo está bien, deberías ver un mensaje parecido a:
+
+`Hi tu-usuario! You've successfully authenticated, but GitHub does not provide shell access.`
+
+✅ Con esto, ya puedes clonar repositorios usando la llave SSH, proceso que se indicara a continuación:
+
+## Descargar el proyecto
 
 ### 1️⃣ Clonar el repositorio
 
@@ -34,7 +98,7 @@ git push
 Si necesitas actualizar tu rama con lo último de main:
 
 ```bash
-git checkout pepito
+git checkout juan
 git pull origin main
 ```
 
