@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode", // Prettier
+    "dbaeumer.vscode-eslint", // ESLint (muy usado en Next.js)
+    "bradlc.vscode-tailwindcss", // Soporte de Tailwind CSS
+    "streetsidesoftware.code-spell-checker" // Corrector ortográfico (opcional, para evitar typos)
+  ]
+}
