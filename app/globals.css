@@ -8,13 +8,24 @@
   --temp-warm: #facc15; /* amarillo */
   --temp-hot: #ef4444; /* rojo */
   --accent: #8b5cf6; /* morado (para resaltar búsquedas/recorridos) */
+  --accent-hover: #7c3aed; /* morado más oscuro al pasar el mouse */
+  --secondary: #e5e7eb; /* gris claro para secundario */
+  --secondary-hover: #a7a9ad; /* gris más oscuro al pasar el mouse */
+  --border: #d4d4d8; /* gris para bordes */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  /* Fuentes */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  /* Colores accent */
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-border: var(--border);
 }
 
 @media (prefers-color-scheme: dark) {
