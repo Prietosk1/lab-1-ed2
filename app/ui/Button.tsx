@@ -11,11 +11,11 @@ export default function Button({
   // Dependiendo del variant, aplicamos diferentes clases
   const variantClasses =
     variant === 'primary'
-      ? 'bg-accent text-background hover:bg-accent-hover'
+      ? 'bg-accent text-foreground hover:bg-accent-hover hover:scale-[1.02]'
       : 'bg-secondary text-accent hover:bg-secondary-hover';
   return (
     <button
-      className={`rounded px-4 py-2 font-sans text-sm font-bold transition-colors ${variantClasses} ${className}`}
+      className={`cursor-pointer rounded px-4 py-2 font-sans text-sm font-bold transition-all duration-200 ease-in hover:scale-103 ${variantClasses} ${className}`}
       {...props}
     />
   );

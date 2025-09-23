@@ -2,33 +2,47 @@ import { useEffect, useRef, useState } from 'react';
 import Tree from 'react-d3-tree';
 
 const orgChart = {
-  name: 'CEO',
+  name: 'Temperaturas',
   children: [
     {
-      name: 'Manager',
-      attributes: {
-        department: 'Production',
-      },
+      name: 'Colombia',
+      attributes: { temp: '25°C' },
       children: [
         {
-          name: 'Foreman',
-          attributes: {
-            department: 'Fabrication',
-          },
-          children: [
-            {
-              name: 'Worker',
-            },
-          ],
+          name: 'Bogotá',
+          attributes: { temp: '18°C' },
         },
         {
-          name: 'Foreman',
-          attributes: {
-            department: 'Assembly',
-          },
+          name: 'Cartagena',
+          attributes: { temp: '30°C' },
+        },
+      ],
+    },
+    {
+      name: 'México',
+      attributes: { temp: '28°C' },
+      children: [
+        {
+          name: 'CDMX',
+          attributes: { temp: '21°C' },
+        },
+        {
+          name: 'Cancún',
+          attributes: { temp: '29°C' },
           children: [
             {
-              name: 'Worker',
+              name: 'Argentina',
+              attributes: { temp: '20°C' },
+              children: [
+                {
+                  name: 'Buenos Aires',
+                  attributes: { temp: '19°C' },
+                },
+              ],
+            },
+            {
+              name: 'Córdoba',
+              attributes: { temp: '22°C' },
             },
           ],
         },
@@ -63,7 +77,7 @@ export default function TempTree() {
   return (
     <div
       ref={containerRef}
-      className="basis-full overflow-auto bg-yellow-500 p-3 md:h-auto md:flex-1 md:basis-0"
+      className="bg-foreground basis-full overflow-auto rounded p-3 md:h-auto md:flex-1 md:basis-0"
     >
       <Tree
         data={orgChart}
@@ -73,6 +87,10 @@ export default function TempTree() {
           y: dimensions.height / 4, // ajusta vertical según prefieras
         }}
         dimensions={dimensions}
+        collapsible={false}
+        zoom={0.8}
+        nodeSize={{ x: 100, y: 100 }}
+        pathFunc={'straight'}
       />
     </div>
   );

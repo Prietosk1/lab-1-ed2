@@ -3,6 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --mask: #00000023;
   --temp-cold: #3b82f6; /* azul */
   --temp-cool: #22c55e; /* verde */
   --temp-warm: #facc15; /* amarillo */
@@ -26,12 +27,14 @@
   --color-secondary: var(--secondary);
   --color-secondary-hover: var(--secondary-hover);
   --color-border: var(--border);
+  --color-mask: var(--mask);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --mask: #ffffff2c;
   }
 }
 
