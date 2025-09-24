@@ -10,7 +10,7 @@ export default function Logo() {
         height={30}
         color="green"
       />
-      <h1 className="text-2xl font-bold">
+      <h1 className="text-3xl font-bold">
         <span className="text-accent">Tree</span>{' '}
         <span className="decoration-mask underline decoration-wavy underline-offset-4">
           m a t r i c

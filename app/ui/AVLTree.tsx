@@ -78,7 +78,7 @@ export default function AVLTree() {
         renderCustomNodeElement={(rd3tProps) => <CustomNode {...rd3tProps} />}
         pathClassFunc={linkClass}
         separation={{ siblings: 1, nonSiblings: 1 }}
-        depthFactor={400}
+        depthFactor={600}
       />
     </div>
   );

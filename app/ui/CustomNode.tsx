@@ -1,7 +1,10 @@
 import { CustomNodeElementProps } from 'react-d3-tree';
+import getTempColor from '@/app/scripts/getColor';
 
 export default function CustomNode({ nodeDatum }: CustomNodeElementProps) {
   const flag = nodeDatum.attributes?.flag;
+  const temp = nodeDatum.attributes?.temp ?? 0; // asumir que tienes temp numérico
+  const color = getTempColor(temp as number);
 
   if (nodeDatum.name === '') {
     return (
@@ -13,7 +16,7 @@ export default function CustomNode({ nodeDatum }: CustomNodeElementProps) {
   }
   return (
     <g>
-      <circle r={40} fill="steelblue" />
+      <circle r={40} fill={color} />
       <text fill="black" strokeWidth="0.5" x="50" y="2.5" fontSize={'18px'}>
         {nodeDatum.name}
       </text>
