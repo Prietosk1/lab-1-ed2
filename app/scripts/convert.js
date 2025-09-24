@@ -20,14 +20,24 @@ const enriched = result.data.map((row) => {
   const flag =
     codeISO2 == 'WLD' ? null : `https://flagcdn.com/w20/${codeISO2}.png`;
 
+  let tempSum = 0;
+  let countriesCount = 0;
+
+  for (let year = 1961; year <= 2022; year++) {
+    const key = `F${year}`;
+    if (row[key] !== undefined && row[key] !== null) {
+      tempSum += parseFloat(row[key]); // asegurar que sea número
+      countriesCount++;
+    }
+  }
+
   return {
     id: parseInt(row.ObjectId, 10),
     name: row.Country,
     code: row.ISO3,
     temperatures,
     flag,
-    avgTempChange:
-      (parseFloat(row.F2022) - parseFloat(row.F1961)) / (years.length - 1),
+    avgTempChange: tempSum / countriesCount,
   };
 });
 
