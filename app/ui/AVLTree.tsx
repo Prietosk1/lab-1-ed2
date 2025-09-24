@@ -51,7 +51,7 @@ const orgChart = {
   ],
 };
 
-export default function TempTree() {
+export default function AVLTree() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
