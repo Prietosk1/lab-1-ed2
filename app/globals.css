@@ -28,6 +28,7 @@
   --color-secondary-hover: var(--secondary-hover);
   --color-border: var(--border);
   --color-mask: var(--mask);
+  --color-tree: var(--temp-cool);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -52,4 +53,22 @@ body {
 .link__to-empty {
   stroke: #fff; /* invisible */
   stroke-width: 0px;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-thumb-blue::-webkit-scrollbar-thumb {
+  background-color: var(--accent);
+  border-radius: 3px;
+}
+
+.scrollbar-track-gray::-webkit-scrollbar-track {
+  background: -var(--background);
+}
+* {
+  scrollbar-width: thin; /* auto, thin, none */
+  scrollbar-color: var(--accent) var(--background); /* thumb track */
 }
