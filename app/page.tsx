@@ -35,6 +35,11 @@ export default function Home() {
           <Button variant="secondary" className="col-span-2">
             Mayor al promedio
           </Button>
+          <Separator text="Recorrido" />
+          <Button variant="primary" className="col-span-2">
+            Hacer Recorrido Por niveles
+          </Button>
+
           <Separator text="Configuraciones visuales" />
           <DecimalSlider
             className="col-span-2"

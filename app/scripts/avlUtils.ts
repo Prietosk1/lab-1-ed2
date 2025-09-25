@@ -55,6 +55,49 @@ function rotateLeft(node: TreeNode): TreeNode {
 
   return right;
 }
+function getLevelOrderRecursive(
+  node: TreeNode | EmptyTre,
+  level: number = 1,
+  current: number = 1
+): string[][] {
+  if (isEmpty(node)) return [];
+
+  // Caso base: estamos en el nivel buscado
+  if (current === level) {
+    return [[node.attributes.code]];
+  }
+
+  // Caso recursivo: bajar a los hijos
+  const leftLevels = getLevelOrderRecursive(
+    node.children[0],
+    level,
+    current + 1
+  );
+  const rightLevels = getLevelOrderRecursive(
+    node.children[1],
+    level,
+    current + 1
+  );
+
+  // Combinar resultados de izquierda y derecha
+  const merged: string[][] = [];
+  for (let i = 0; i < Math.max(leftLevels.length, rightLevels.length); i++) {
+    merged[i] = [...(leftLevels[i] ?? []), ...(rightLevels[i] ?? [])];
+  }
+
+  // Si estamos en la raíz, necesitamos recorrer todos los niveles
+  if (current === 1 && level === 1) {
+    const h = getHeight(node);
+    const result: string[][] = [];
+    for (let l = 1; l <= h; l++) {
+      const lvl = getLevelOrderRecursive(node, l, 1);
+      if (lvl.length > 0) result.push(...lvl);
+    }
+    return result;
+  }
+
+  return merged;
+}
 
 function insert(node: TreeNode | null, newNode: TreeNode): TreeNode {
   if (!node || node.name === '') return newNode; // Si el nodo hijo esta vacio, se retornar el nuevo nodo para insertarlo
