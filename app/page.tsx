@@ -7,7 +7,8 @@ import Logo from '@/app/ui/Logo';
 import DecimalSlider from '@/app/ui/DecimalSlider';
 import { useState } from 'react';
 import { TreeNode } from './types/treeNode';
-import generateTreeData from './scripts/generateTreeData';
+import { getLevelOrderRecursive } from './scripts/avlUtils';
+import { generateTreeData } from './scripts/generateTreeData';
 
 const DynamicAVLTree = dynamic(() => import('@/app/ui/AVLTree'), {
   ssr: false,
@@ -41,8 +42,21 @@ export default function Home() {
             Mayor al promedio
           </Button>
           <Separator text="Recorrido" />
-          <Button variant="primary" className="col-span-2">
-            Hacer Recorrido Por niveles
+          <Button
+            onClick={() => {
+              const niveles = getLevelOrderRecursive(treeData);
+
+              console.log('Recorrido por niveles:', niveles);
+
+              // Mostrar cada nivel en consola
+              niveles.forEach((nivel, i) => {
+                console.log(`Nivel ${i + 1}: ${nivel.join(' ')}`);
+              });
+            }}
+            variant="primary"
+            className="col-span-2"
+          >
+            Hacer Recorrido Por Niveles
           </Button>
 
           <Separator text="Configuraciones visuales" />

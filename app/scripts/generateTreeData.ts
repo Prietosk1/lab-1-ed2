@@ -3,13 +3,12 @@ import { TreeNode } from '@/app/types/treeNode';
 import dataset from '@/app/data/dataset_climate_change.json';
 import { insert } from '@/app/scripts/avlUtils';
 
-export default function generateTreeData(): TreeNode {
+function generateTreeData(): TreeNode {
   const countries: CountryData[] = dataset as CountryData[];
 
   let root: TreeNode | null = null;
 
   for (const country of countries) {
-    // Crear un nuevo nodo para el país
     const node: TreeNode = {
       name: country.name,
       attributes: {
@@ -22,8 +21,10 @@ export default function generateTreeData(): TreeNode {
       children: [{ name: '' }, { name: '' }],
     };
 
-    // Insertar el nodo en el árbol
     root = insert(root, node);
   }
-  return root!; // Retornar el árbol generado o el placeholder si el árbol está vacío
+
+  return root!;
 }
+
+export { generateTreeData };

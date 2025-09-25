@@ -55,48 +55,38 @@ function rotateLeft(node: TreeNode): TreeNode {
 
   return right;
 }
-function getLevelOrderRecursive(
-  node: TreeNode | EmptyTre,
-  level: number = 1,
-  current: number = 1
-): string[][] {
-  if (isEmpty(node)) return [];
 
-  // Caso base: estamos en el nivel buscado
-  if (current === level) {
-    return [[node.attributes.code]];
+// Verifica si un nodo es vacío
+function isEmpty(node: TreeNode) {
+  return !node || node.name === '';
+}
+
+// RECORRIDO POR NIVELES
+// Recorrido por niveles (recursivo)
+function getLevelOrderRecursive(root: TreeNode): string[][] {
+  const result: string[][] = [];
+  const h = getHeight(root); // altura del árbol
+
+  // Para cada nivel, recolectamos los nodos
+  for (let i = 1; i <= h; i++) {
+    const level: string[] = [];
+    collectLevel(root, i, level);
+    result.push(level);
   }
 
-  // Caso recursivo: bajar a los hijos
-  const leftLevels = getLevelOrderRecursive(
-    node.children[0],
-    level,
-    current + 1
-  );
-  const rightLevels = getLevelOrderRecursive(
-    node.children[1],
-    level,
-    current + 1
-  );
+  return result;
+}
 
-  // Combinar resultados de izquierda y derecha
-  const merged: string[][] = [];
-  for (let i = 0; i < Math.max(leftLevels.length, rightLevels.length); i++) {
-    merged[i] = [...(leftLevels[i] ?? []), ...(rightLevels[i] ?? [])];
+// Función auxiliar recursiva que recolecta nodos de un nivel específico
+function collectLevel(node: TreeNode, level: number, acc: string[]): void {
+  if (isEmpty(node)) return;
+
+  if (level === 1) {
+    acc.push(node.attributes.code); // ISO3 del país
+  } else {
+    collectLevel(node.children[0] as TreeNode, level - 1, acc);
+    collectLevel(node.children[1] as TreeNode, level - 1, acc);
   }
-
-  // Si estamos en la raíz, necesitamos recorrer todos los niveles
-  if (current === 1 && level === 1) {
-    const h = getHeight(node);
-    const result: string[][] = [];
-    for (let l = 1; l <= h; l++) {
-      const lvl = getLevelOrderRecursive(node, l, 1);
-      if (lvl.length > 0) result.push(...lvl);
-    }
-    return result;
-  }
-
-  return merged;
 }
 
 function insert(node: TreeNode | null, newNode: TreeNode): TreeNode {
@@ -156,4 +146,4 @@ function insert(node: TreeNode | null, newNode: TreeNode): TreeNode {
   return node;
 }
 
-export { insert };
+export { insert, getLevelOrderRecursive };
