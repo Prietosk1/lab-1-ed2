@@ -146,4 +146,16 @@ function insert(node: TreeNode | null, newNode: TreeNode): TreeNode {
   return node;
 }
 
-export { insert, getLevelOrderRecursive };
+function deleteNode(): void {}
+
+function searchNode(root: TreeNode, temp: string): TreeNode | null {
+  // Recorrer todo el árbol en busca del nodo con la temperatura dada
+
+  // Si encuetra el nodo, lo retorna
+
+  console.log('Buscando nodo con temperatura:', temp);
+  // Si no lo encuentra,
+  return null;
+}
+
+export { insert, searchNode, getLevelOrderRecursive };
