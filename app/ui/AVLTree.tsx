@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import Tree, { PathFunction, RawNodeDatum, TreeLinkDatum } from 'react-d3-tree';
-import generateTreeData from '@/app/scripts/generateTreeData';
 import { TreeNode } from '@/app/types/treeNode';
 import CustomNode from './CustomNode';
 
@@ -40,7 +39,7 @@ export default function AVLTree({ data }: { data: TreeNode }) {
   return (
     <div
       ref={containerRef}
-      className="bg-foreground basis-full overflow-auto rounded p-3 md:h-auto md:flex-1 md:basis-0"
+      className="basis-full overflow-auto rounded bg-gray-100 p-3 md:h-auto md:flex-1 md:basis-0"
     >
       <Tree
         data={data as RawNodeDatum}
