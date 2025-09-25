@@ -8,6 +8,7 @@ import DecimalSlider from '@/app/ui/DecimalSlider';
 import { useState } from 'react';
 import { TreeNode } from './types/treeNode';
 import generateTreeData from './scripts/generateTreeData';
+import { searchNode } from './scripts/avlUtils';
 
 const DynamicAVLTree = dynamic(() => import('@/app/ui/AVLTree'), {
   ssr: false,
@@ -15,6 +16,7 @@ const DynamicAVLTree = dynamic(() => import('@/app/ui/AVLTree'), {
 
 export default function Home() {
   const [treeData, setTreeData] = useState<TreeNode>(generateTreeData()); // Datos del árbol
+  const [temp, setTemp] = useState<string>('0.01'); // Temperatura promedio del año a buscar
 
   return (
     <>
@@ -24,11 +26,24 @@ export default function Home() {
           <Separator text="Inserción" />
           <Button className="col-span-4 md:col-span-2">Agregar nodo</Button>
           <Separator text="Eliminación y busqueda de nodo por metrica" />
-          <Input className="col-span-2" label="Metrica" placeholder="0.001" />
-          <Button className="col-span-1">Eliminar</Button>
-          <Button variant="secondary" className="col-span-1">
+
+          <Input
+            value={temp}
+            onChange={(e) => setTemp(e.target.value)}
+            className="col-span-2"
+            label="Metrica"
+            placeholder="0.001"
+          />
+
+          <Button
+            onClick={() => searchNode(treeData, temp)}
+            variant="secondary"
+            className="col-span-1"
+          >
             Buscar
           </Button>
+
+          <Button className="col-span-1">Eliminar</Button>
           <Separator text="Busqueda por temperatura promedio de año" />
           <Input
             className="col-span-4 md:col-span-2"
