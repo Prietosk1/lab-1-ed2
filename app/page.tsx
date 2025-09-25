@@ -40,10 +40,7 @@ export default function Home() {
             className="col-span-2"
             label="Profundidad de los nodos"
           />
-          <DecimalSlider
-            className="col-span-2"
-            label="Distancia entre nodos hermanos"
-          />
+          <DecimalSlider className="col-span-2" label="Distancia entre nodos" />
         </div>
         <DynamicAVLTree />
       </div>
