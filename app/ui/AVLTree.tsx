@@ -4,30 +4,9 @@ import generateTreeData from '@/app/scripts/generateTreeData';
 import { TreeNode } from '@/app/types/treeNode';
 import CustomNode from './CustomNode';
 
-const treeExample: TreeNode = {
-  name: 'Root',
-  attributes: { temp: 0.001, tempStr: 'N/A', code: 'N/A', flag: '', height: 2 },
-  children: [
-    { name: '' },
-    {
-      name: 'Child 2',
-      attributes: {
-        temp: 0.002,
-        tempStr: 'N/A',
-        code: 'N/A',
-        flag: 'https://flagcdn.com/w20/af.png',
-        height: 1,
-      },
-      children: [{ name: '' }, { name: '' }],
-    },
-  ],
-};
-
-export default function AVLTree() {
+export default function AVLTree({ data }: { data: TreeNode }) {
   const containerRef = useRef<HTMLDivElement>(null); // Ref para el contenedor del árbol
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 }); // Dimensiones del contenedor
-  const [treeData, setTreeData] = useState<TreeNode>(generateTreeData()); // Datos del árbol
-  // const [treeData, setTreeData] = useState<TreeNode>(treeExample); // Datos del árbol de prueba
 
   //
   const linkClass: PathFunction = ({ target }: TreeLinkDatum) => {
@@ -64,7 +43,7 @@ export default function AVLTree() {
       className="bg-foreground basis-full overflow-auto rounded p-3 md:h-auto md:flex-1 md:basis-0"
     >
       <Tree
-        data={treeData as RawNodeDatum}
+        data={data as RawNodeDatum}
         orientation="vertical"
         translate={{
           x: dimensions.width / 2, // centra horizontalmente
