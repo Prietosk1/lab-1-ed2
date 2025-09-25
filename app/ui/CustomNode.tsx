@@ -18,7 +18,7 @@ export default function CustomNode({ nodeDatum }: CustomNodeElementProps) {
     <g>
       <circle r={40} fill={color} />
       <text fill="black" strokeWidth="0.5" x="50" y="2.5" fontSize={'18px'}>
-        {nodeDatum.name}
+        {nodeDatum.name} - {nodeDatum.attributes?.code}
       </text>
       <text fill="grey" strokeWidth="0.5" x="50" y="25" fontSize={'18px'}>
         {nodeDatum.attributes?.tempStr}

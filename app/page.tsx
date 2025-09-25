@@ -5,12 +5,17 @@ import Input from '@/app/ui/Input';
 import Separator from '@/app/ui/Separator';
 import Logo from '@/app/ui/Logo';
 import DecimalSlider from '@/app/ui/DecimalSlider';
+import { useState } from 'react';
+import { TreeNode } from './types/treeNode';
+import generateTreeData from './scripts/generateTreeData';
 
 const DynamicAVLTree = dynamic(() => import('@/app/ui/AVLTree'), {
   ssr: false,
 });
 
 export default function Home() {
+  const [treeData, setTreeData] = useState<TreeNode>(generateTreeData()); // Datos del árbol
+
   return (
     <>
       <div className="flex h-screen w-full flex-col gap-3 p-3 md:flex-row">
@@ -45,12 +50,9 @@ export default function Home() {
             className="col-span-2"
             label="Profundidad de los nodos"
           />
-          <DecimalSlider
-            className="col-span-2"
-            label="Distancia entre nodos hermanos"
-          />
+          <DecimalSlider className="col-span-2" label="Distancia entre nodos" />
         </div>
-        <DynamicAVLTree />
+        <DynamicAVLTree data={treeData} />
       </div>
     </>
   );
