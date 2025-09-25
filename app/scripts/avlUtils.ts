@@ -140,8 +140,6 @@ function insert(node: TreeNode | null, newNode: TreeNode): TreeNode {
   return node;
 }
 
-function deleteNode(): void {}
-
 // a. Obtener el nivel del nodo (raíz = nivel 0)
 function getNodeLevel(
   root: TreeNode,
@@ -206,6 +204,83 @@ function getUncle(root: TreeNode, target: TreeNode): TreeNode | null {
       : (grandparent.children[0] as TreeNode);
   }
 }
+function deleteNode(root: TreeNode, temp: number): TreeNode {
+  if (!root || isEmpty(root)) return createEmptyNode();
+
+  const targetTemp = Number(temp.toFixed(4));
+  const nodeTemp = Number(root.attributes.temp.toFixed(4));
+
+  // Buscar el nodo a eliminar
+  if (targetTemp < nodeTemp) {
+    root.children[0] = deleteNode(root.children[0] as TreeNode, temp);
+  } else if (targetTemp > nodeTemp) {
+    root.children[1] = deleteNode(root.children[1] as TreeNode, temp);
+  } else {
+    // Nodo encontrado
+    const left = root.children[0] as TreeNode;
+    const right = root.children[1] as TreeNode;
+
+    // Caso 1: sin hijos
+    if (isEmpty(left) && isEmpty(right)) {
+      return createEmptyNode(); // nodo vacío
+    }
+
+    // Caso 2: un hijo
+    if (isEmpty(left)) return right;
+    if (isEmpty(right)) return left;
+
+    // Caso 3: dos hijos → buscar sucesor (mínimo en subárbol derecho)
+    let successor = right;
+    while (!isEmpty(successor.children[0] as TreeNode)) {
+      successor = successor.children[0] as TreeNode;
+    }
+
+    // Copiar datos del sucesor
+    root.name = successor.name;
+    root.attributes = successor.attributes;
+
+    // Eliminar el sucesor
+    root.children[1] = deleteNode(right, successor.attributes.temp);
+  }
+
+  // Actualizar altura y balancear
+  updateHeight(root);
+  const balance = getBalance(root);
+
+  // Rotaciones
+  if (balance < -1 && getBalance(root.children[0] as TreeNode) <= 0) {
+    return rotateRight(root);
+  }
+
+  if (balance > 1 && getBalance(root.children[1] as TreeNode) >= 0) {
+    return rotateLeft(root);
+  }
+
+  if (balance < -1 && getBalance(root.children[0] as TreeNode) > 0) {
+    root.children[0] = rotateLeft(root.children[0] as TreeNode);
+    return rotateRight(root);
+  }
+
+  if (balance > 1 && getBalance(root.children[1] as TreeNode) < 0) {
+    root.children[1] = rotateRight(root.children[1] as TreeNode);
+    return rotateLeft(root);
+  }
+
+  return root;
+}
+function createEmptyNode(): TreeNode {
+  return {
+    name: '',
+    attributes: {
+      temp: 0,
+      tempStr: '0.0000°C',
+      code: '',
+      flag: null,
+      height: 1,
+    },
+    children: [{ name: '' }, { name: '' }],
+  };
+}
 
 function findNodeByTemp(root: TreeNode, temp: number): TreeNode | null {
   if (isEmpty(root)) return null;
@@ -224,12 +299,12 @@ function findNodeByTemp(root: TreeNode, temp: number): TreeNode | null {
 
 export {
   insert,
-  searchNode,
   getLevelOrderRecursive,
   findNodeByTemp,
   getNodeLevel,
   getBalance,
   getParent,
   getGrandparent,
+  deleteNode,
   getUncle,
 };

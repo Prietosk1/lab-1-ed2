@@ -15,14 +15,15 @@ import {
   getNodeLevel,
   getParent,
   getUncle,
+  deleteNode,
 } from './scripts/avlUtils';
 import { generateTreeData } from './scripts/generateTreeData';
-import { searchNode } from './scripts/avlUtils';
 import { levelWalkthrogh } from './scripts/buttonUtils';
 
 const DynamicAVLTree = dynamic(() => import('@/app/ui/AVLTree'), {
   ssr: false,
 });
+
 function formatNodeInfo(
   relative: TreeNode | null,
   label: string,
@@ -41,35 +42,42 @@ function formatNodeInfo(
 }
 
 export default function Home() {
-  const [treeData, setTreeData] = useState<TreeNode>(generateTreeData()); // Datos del árbol
-  const [temp, setTemp] = useState<string>('0.01'); // Temperatura promedio del año a buscar
+  const [treeData, setTreeData] = useState<TreeNode>(generateTreeData());
+  const [temp, setTemp] = useState<string>('0.01');
 
   return (
     <>
       <div className="flex h-screen w-full flex-col gap-3 p-3 md:flex-row">
         <div className="bg-mask scrollbar-thin scrollbar-thumb-blue scrollbar-track-gray grid w-full auto-rows-min grid-cols-4 gap-3 overflow-auto rounded p-4 md:w-92 md:grid-cols-2">
           <Logo />
-          {/* Inserccion */}
+
+          {/* Inserción */}
           <Separator text="Inserción" />
           <Button className="col-span-4 md:col-span-2">Agregar nodo</Button>
-          <Separator text="Eliminación y busqueda de nodo por metrica" />
+
+          {/* Eliminación y búsqueda */}
+          <Separator text="Eliminación y búsqueda de nodo por métrica" />
           <Input
             value={temp}
             onChange={(e) => setTemp(e.target.value)}
             className="col-span-2"
-            label="Metrica"
+            label="Métrica"
             placeholder="0.001"
             type="number"
           />
+
+          {/* Buscar */}
           <Button
             onClick={() => {
               const node = findNodeByTemp(treeData, Number(temp));
               if (node) {
                 console.log(
-                  `Nodo encontrado: ${node.name} (${node.attributes.code}, temp = ${node.attributes.temp})`
+                  `Nodo encontrado: ${node.name} (${node.attributes.code}, temp=${node.attributes.temp.toFixed(4)})`
                 );
               } else {
-                console.log(`No se encontró ningún nodo con: ${Number(temp)}`);
+                console.log(
+                  `No se encontró ningún nodo con temp=${Number(temp).toFixed(4)}`
+                );
               }
             }}
             variant="secondary"
@@ -77,10 +85,34 @@ export default function Home() {
           >
             Buscar
           </Button>
-          <Button className="col-span-1">Eliminar</Button>
 
-          {/* Busqueda por temperatura promedio de año */}
-          <Separator text="Busqueda por temperatura promedio de año" />
+          {/* Eliminar */}
+          <Button
+            className="col-span-1"
+            onClick={() => {
+              const tempValue = Number(temp);
+              const nodeToDelete = findNodeByTemp(treeData, tempValue);
+
+              if (!nodeToDelete) {
+                console.log(
+                  `No se encontró ningún nodo con temp=${tempValue.toFixed(4)}`
+                );
+                return;
+              }
+
+              const updatedTree = deleteNode(treeData, tempValue);
+              setTreeData(updatedTree!);
+
+              console.log(
+                `Nodo eliminado: ${nodeToDelete.name} (${nodeToDelete.attributes.code}, temp=${nodeToDelete.attributes.temp.toFixed(4)})`
+              );
+            }}
+          >
+            Eliminar
+          </Button>
+
+          {/* Búsqueda por temperatura promedio de año */}
+          <Separator text="Búsqueda por temperatura promedio de año" />
           <Input
             className="col-span-4 md:col-span-2"
             label="Año"
@@ -93,6 +125,7 @@ export default function Home() {
           <Button variant="secondary" className="col-span-2">
             Mayor al promedio
           </Button>
+
           {/* Recorrido por niveles */}
           <Separator text="Recorrido" />
           <Button
@@ -102,6 +135,8 @@ export default function Home() {
           >
             Hacer Recorrido Por Niveles
           </Button>
+
+          {/* Operaciones sobre nodo */}
           <Separator text="Operaciones sobre nodo (por métrica)" />
 
           {/* a. Nivel */}
@@ -196,6 +231,8 @@ export default function Home() {
           />
           <DecimalSlider className="col-span-2" label="Distancia entre nodos" />
         </div>
+
+        {/* Visualización del árbol */}
         <DynamicAVLTree data={treeData} />
       </div>
     </>
