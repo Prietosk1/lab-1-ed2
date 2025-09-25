@@ -1,4 +1,5 @@
 import { TreeNode } from '@/app/types/treeNode';
+import Tree from 'react-d3-tree';
 
 // Retorna la altura almacenada en el nodo, o 1 si no está definida
 function getHeight(node: TreeNode): number {
@@ -14,14 +15,6 @@ function updateHeight(node: TreeNode): void {
     node.children[1].name === '' ? 0 : getHeight(node.children[1] as TreeNode);
 
   node.attributes.height = Math.max(leftHeight, rightHeight) + 1;
-}
-
-// Calcula el factor de balance del nodo
-function getBalance(node: TreeNode): number {
-  return (
-    getHeight(node.children[1] as TreeNode) -
-    getHeight(node.children[0] as TreeNode)
-  );
 }
 
 // Rotación derecha
@@ -84,6 +77,7 @@ function collectLevel(node: TreeNode, level: number, acc: string[]): void {
   if (level === 1) {
     acc.push(node.attributes.code); // ISO3 del país
   } else {
+    console.log(node.attributes.temp + '\n');
     collectLevel(node.children[0] as TreeNode, level - 1, acc);
     collectLevel(node.children[1] as TreeNode, level - 1, acc);
   }
@@ -147,6 +141,85 @@ function insert(node: TreeNode | null, newNode: TreeNode): TreeNode {
 }
 
 function deleteNode(): void {}
+function findNodeByTemp(root: TreeNode, temp: number): TreeNode | null {
+  if (isEmpty(root)) return null;
+
+  // Redondear ambos valores a 4 decimales
+  const nodeTemp = Number(root.attributes.temp.toFixed(4));
+  const targetTemp = Number(temp.toFixed(4));
+
+  if (nodeTemp === targetTemp) return root;
+
+  return (
+    findNodeByTemp(root.children[0] as TreeNode, temp) ||
+    findNodeByTemp(root.children[1] as TreeNode, temp)
+  );
+}
+
+// a. Obtener el nivel del nodo (raíz = nivel 0)
+function getNodeLevel(
+  root: TreeNode,
+  target: TreeNode,
+  level: number = 0
+): number {
+  if (isEmpty(root)) return -1;
+  if (root === target) return level;
+
+  const left = getNodeLevel(root.children[0] as TreeNode, target, level + 1);
+  if (left !== -1) return left;
+
+  return getNodeLevel(root.children[1] as TreeNode, target, level + 1);
+}
+
+// b. Obtener el factor de balanceo
+
+// Calcula el factor de balance del nodo
+function getBalance(node: TreeNode): number {
+  return (
+    getHeight(node.children[1] as TreeNode) -
+    getHeight(node.children[0] as TreeNode)
+  );
+}
+
+// c. Encontrar el padre del nodo
+function getParent(root: TreeNode, target: TreeNode): TreeNode | null {
+  if (isEmpty(root)) return null;
+
+  if (root.children[0] === target || root.children[1] === target) {
+    return root;
+  }
+
+  const left = getParent(root.children[0] as TreeNode, target);
+  if (left) return left;
+
+  return getParent(root.children[1] as TreeNode, target);
+}
+
+// d. Encontrar el abuelo del nodo
+function getGrandparent(root: TreeNode, target: TreeNode): TreeNode | null {
+  const parent = getParent(root, target);
+  if (!parent) return null;
+  return getParent(root, parent);
+}
+
+// e. Encontrar el tío del nodo
+function getUncle(root: TreeNode, target: TreeNode): TreeNode | null {
+  const parent = getParent(root, target);
+  if (!parent) return null;
+
+  const grandparent = getParent(root, parent);
+  if (!grandparent) return null;
+
+  if (grandparent.children[0] === parent) {
+    return isEmpty(grandparent.children[1] as TreeNode)
+      ? null
+      : (grandparent.children[1] as TreeNode);
+  } else {
+    return isEmpty(grandparent.children[0] as TreeNode)
+      ? null
+      : (grandparent.children[0] as TreeNode);
+  }
+}
 
 function searchNode(root: TreeNode, temp: string): TreeNode | null {
   // Recorrer todo el árbol en busca del nodo con la temperatura dada
@@ -158,4 +231,14 @@ function searchNode(root: TreeNode, temp: string): TreeNode | null {
   return null;
 }
 
-export { insert, searchNode, getLevelOrderRecursive };
+export {
+  insert,
+  searchNode,
+  getLevelOrderRecursive,
+  findNodeByTemp,
+  getNodeLevel,
+  getBalance,
+  getParent,
+  getGrandparent,
+  getUncle,
+};

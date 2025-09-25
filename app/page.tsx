@@ -7,13 +7,37 @@ import Logo from '@/app/ui/Logo';
 import DecimalSlider from '@/app/ui/DecimalSlider';
 import { useState } from 'react';
 import { TreeNode } from './types/treeNode';
-import { getLevelOrderRecursive } from './scripts/avlUtils';
+import {
+  findNodeByTemp,
+  getBalance,
+  getGrandparent,
+  getLevelOrderRecursive,
+  getNodeLevel,
+  getParent,
+  getUncle,
+} from './scripts/avlUtils';
 import { generateTreeData } from './scripts/generateTreeData';
 import { searchNode } from './scripts/avlUtils';
 
 const DynamicAVLTree = dynamic(() => import('@/app/ui/AVLTree'), {
   ssr: false,
 });
+function formatNodeInfo(
+  relative: TreeNode | null,
+  label: string,
+  original: TreeNode
+) {
+  if (!relative) {
+    console.log(
+      `${label} del nodo ${original.name} (${original.attributes.code}, temp=${original.attributes.temp}): Ninguno`
+    );
+  } else {
+    console.log(
+      `${label} del nodo ${original.name} (${original.attributes.code}, temp=${original.attributes.temp}): ` +
+        `${relative.name} (${relative.attributes.code}, temp=${relative.attributes.temp})`
+    );
+  }
+}
 
 export default function Home() {
   const [treeData, setTreeData] = useState<TreeNode>(generateTreeData()); // Datos del árbol
@@ -27,7 +51,6 @@ export default function Home() {
           <Separator text="Inserción" />
           <Button className="col-span-4 md:col-span-2">Agregar nodo</Button>
           <Separator text="Eliminación y busqueda de nodo por metrica" />
-
           <Input
             value={temp}
             onChange={(e) => setTemp(e.target.value)}
@@ -35,7 +58,6 @@ export default function Home() {
             label="Metrica"
             placeholder="0.001"
           />
-
           <Button
             onClick={() => searchNode(treeData, temp)}
             variant="secondary"
@@ -43,7 +65,6 @@ export default function Home() {
           >
             Buscar
           </Button>
-
           <Button className="col-span-1">Eliminar</Button>
           <Separator text="Busqueda por temperatura promedio de año" />
           <Input
@@ -72,6 +93,91 @@ export default function Home() {
             className="col-span-2"
           >
             Hacer Recorrido Por Niveles
+          </Button>
+          <Separator text="Operaciones sobre nodo (por métrica)" />
+
+          {/* a. Nivel */}
+          <Button
+            className="col-span-2"
+            onClick={() => {
+              const node = findNodeByTemp(treeData, Number(temp));
+              if (node) {
+                const nivel = getNodeLevel(treeData, node);
+                console.log(
+                  `Nivel del nodo ${node.name} (${node.attributes.code}, temp=${node.attributes.temp}): ${nivel}`
+                );
+              } else {
+                console.log('Nodo no encontrado');
+              }
+            }}
+          >
+            a. Obtener nivel
+          </Button>
+
+          {/* b. Balance */}
+          <Button
+            className="col-span-2"
+            onClick={() => {
+              const node = findNodeByTemp(treeData, Number(temp));
+              if (node) {
+                const balance = getBalance(node);
+                console.log(
+                  `Balance del nodo ${node.name} (${node.attributes.code}, temp=${node.attributes.temp}): ${balance}`
+                );
+              } else {
+                console.log('Nodo no encontrado');
+              }
+            }}
+          >
+            b. Factor de balanceo
+          </Button>
+
+          {/* c. Padre */}
+          <Button
+            className="col-span-2"
+            onClick={() => {
+              const node = findNodeByTemp(treeData, Number(temp));
+              if (node) {
+                const padre = getParent(treeData, node);
+                formatNodeInfo(padre, 'Padre', node);
+              } else {
+                console.log('Nodo no encontrado');
+              }
+            }}
+          >
+            c. Padre
+          </Button>
+
+          {/* d. Abuelo */}
+          <Button
+            className="col-span-2"
+            onClick={() => {
+              const node = findNodeByTemp(treeData, Number(temp));
+              if (node) {
+                const abuelo = getGrandparent(treeData, node);
+                formatNodeInfo(abuelo, 'Abuelo', node);
+              } else {
+                console.log('Nodo no encontrado');
+              }
+            }}
+          >
+            d. Abuelo
+          </Button>
+
+          {/* e. Tío */}
+          <Button
+            className="col-span-2"
+            onClick={() => {
+              const node = findNodeByTemp(treeData, Number(temp));
+              if (node) {
+                const tio = getUncle(treeData, node);
+                formatNodeInfo(tio, 'Tío', node);
+              } else {
+                console.log('Nodo no encontrado');
+              }
+            }}
+          >
+            e. Tío
           </Button>
 
           <Separator text="Configuraciones visuales" />
