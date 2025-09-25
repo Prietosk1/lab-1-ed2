@@ -44,6 +44,7 @@ function formatNodeInfo(
 export default function Home() {
   const [treeData, setTreeData] = useState<TreeNode>(generateTreeData());
   const [temp, setTemp] = useState<string>('0.01');
+  const [deletedMessage, setDeletedMessage] = useState<string | null>(null);
 
   return (
     <>
@@ -94,18 +95,18 @@ export default function Home() {
               const nodeToDelete = findNodeByTemp(treeData, tempValue);
 
               if (!nodeToDelete) {
-                console.log(
-                  `No se encontró ningún nodo con temp=${tempValue.toFixed(4)}`
-                );
+                const msg = `❌ No se encontró ningún nodo con temp=${tempValue.toFixed(4)}`;
+                console.log(msg);
+                setDeletedMessage(msg);
                 return;
               }
 
               const updatedTree = deleteNode(treeData, tempValue);
               setTreeData(updatedTree!);
 
-              console.log(
-                `Nodo eliminado: ${nodeToDelete.name} (${nodeToDelete.attributes.code}, temp=${nodeToDelete.attributes.temp.toFixed(4)})`
-              );
+              const msg = `✅ Nodo eliminado: ${nodeToDelete.name} (${nodeToDelete.attributes.code}, temp=${nodeToDelete.attributes.temp.toFixed(4)})`;
+              console.log(msg);
+              setDeletedMessage(msg);
             }}
           >
             Eliminar
@@ -233,7 +234,7 @@ export default function Home() {
         </div>
 
         {/* Visualización del árbol */}
-        <DynamicAVLTree data={treeData} />
+        <DynamicAVLTree key={JSON.stringify(treeData)} data={treeData} />
       </div>
     </>
   );
