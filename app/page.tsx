@@ -62,7 +62,16 @@ export default function Home() {
             type="number"
           />
           <Button
-            onClick={() => searchNode(treeData, temp)}
+            onClick={() => {
+              const node = findNodeByTemp(treeData, Number(temp));
+              if (node) {
+                console.log(
+                  `Nodo encontrado: ${node.name} (${node.attributes.code}, temp = ${node.attributes.temp})`
+                );
+              } else {
+                console.log(`No se encontró ningún nodo con: ${Number(temp)}`);
+              }
+            }}
             variant="secondary"
             className="col-span-1"
           >

@@ -141,20 +141,6 @@ function insert(node: TreeNode | null, newNode: TreeNode): TreeNode {
 }
 
 function deleteNode(): void {}
-function findNodeByTemp(root: TreeNode, temp: number): TreeNode | null {
-  if (isEmpty(root)) return null;
-
-  // Redondear ambos valores a 4 decimales
-  const nodeTemp = Number(root.attributes.temp.toFixed(4));
-  const targetTemp = Number(temp.toFixed(4));
-
-  if (nodeTemp === targetTemp) return root;
-
-  return (
-    findNodeByTemp(root.children[0] as TreeNode, temp) ||
-    findNodeByTemp(root.children[1] as TreeNode, temp)
-  );
-}
 
 // a. Obtener el nivel del nodo (raíz = nivel 0)
 function getNodeLevel(
@@ -221,14 +207,19 @@ function getUncle(root: TreeNode, target: TreeNode): TreeNode | null {
   }
 }
 
-function searchNode(root: TreeNode, temp: string): TreeNode | null {
-  // Recorrer todo el árbol en busca del nodo con la temperatura dada
+function findNodeByTemp(root: TreeNode, temp: number): TreeNode | null {
+  if (isEmpty(root)) return null;
 
-  // Si encuetra el nodo, lo retorna
+  // Redondear ambos valores a 4 decimales
+  const nodeTemp = Number(root.attributes.temp.toFixed(4));
+  const targetTemp = Number(temp.toFixed(4));
 
-  console.log('Buscando nodo con temperatura:', temp);
-  // Si no lo encuentra,
-  return null;
+  if (nodeTemp === targetTemp) return root;
+
+  return (
+    findNodeByTemp(root.children[0] as TreeNode, temp) ||
+    findNodeByTemp(root.children[1] as TreeNode, temp)
+  );
 }
 
 export {
