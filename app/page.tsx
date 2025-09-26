@@ -54,6 +54,7 @@ function formatNodeInfo(
 
 export default function Home() {
   const [treeData, setTreeData] = useState<TreeNode>(generateTreeData());
+  const [treeData2, setTreeData2] = useState<TreeNode>(generateTreeData());
   const [displayTreeData, setDisplayTreeData] =
     useState<TreeNode>(generateTreeData());
   const [temp, setTemp] = useState<string>('');
@@ -329,6 +330,7 @@ export default function Home() {
                 newTreeRoot = insert(newTreeRoot, newNode);
                 console.log(newNode);
               });
+              setTreeData2(treeData);
               setDisplayTreeData(newTreeRoot!);
             }}
           >
@@ -381,7 +383,7 @@ export default function Home() {
                 console.log(newNode);
                 console.log(node);
               });
-
+              setTreeData2(treeData);
               setDisplayTreeData(newTreeRoot!);
             }}
           >
@@ -503,7 +505,9 @@ export default function Home() {
           <Button
             className="col-span-2"
             onClick={() => {
-              setDisplayTreeData(treeData);
+              setTreeData(generateTreeData());
+              setDisplayTreeData(generateTreeData());
+              setTreeData2(generateTreeData());
               Swal.fire({
                 title: 'Arbol reiniciado!',
                 text: `El arbol ha sido reiniciado con los datos por defecto!`,
@@ -514,6 +518,22 @@ export default function Home() {
             variant="secondary"
           >
             Reiniciar arbol
+          </Button>
+          <Button
+            className="col-span-2"
+            onClick={() => {
+              setTreeData(treeData2);
+              setDisplayTreeData(treeData2);
+              Swal.fire({
+                title: 'Arbol actual!',
+                text: `El arbol ha sido reiniciado con los datos actuales`,
+                icon: 'success',
+                confirmButtonText: 'Okay',
+              });
+            }}
+            variant="secondary"
+          >
+            Árbol actual
           </Button>
           <Button
             className="col-span-2"
