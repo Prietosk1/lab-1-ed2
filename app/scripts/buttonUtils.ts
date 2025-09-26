@@ -1,7 +1,7 @@
 import { TreeNode } from '../types/treeNode';
 import { getLevelOrderRecursive } from './avlUtils';
 
-function levelWalkthrogh(data: TreeNode) {
+function levelWalkthrough(data: TreeNode) {
   const niveles = getLevelOrderRecursive(data);
 
   console.log('Recorrido por niveles:', niveles);
@@ -12,4 +12,4 @@ function levelWalkthrogh(data: TreeNode) {
   });
 }
 
-export { levelWalkthrogh };
+export { levelWalkthrough };
