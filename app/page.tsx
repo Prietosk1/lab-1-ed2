@@ -16,6 +16,7 @@ import {
   getParent,
   getUncle,
   deleteNode,
+  insert,
 } from './scripts/avlUtils';
 import { generateTreeData } from './scripts/generateTreeData';
 import { levelWalkthrough } from './scripts/buttonUtils';
@@ -45,6 +46,8 @@ export default function Home() {
   const [treeData, setTreeData] = useState<TreeNode>(generateTreeData());
   const [temp, setTemp] = useState<string>('0.01');
   const [deletedMessage, setDeletedMessage] = useState<string | null>(null);
+  const [newName, setNewName] = useState('');
+  const [newTemp, setNewTemp] = useState('');
 
   return (
     <>
@@ -58,14 +61,52 @@ export default function Home() {
             type="text"
             className="col-span-2 md:col-span-1"
             placeholder="Colombia"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
           />
+
           <Input
             label="Temperatura media"
             className="col-span-2 md:col-span-1"
             type="number"
             placeholder="0.723"
+            value={newTemp}
+            onChange={(e) => setNewTemp(e.target.value)}
           />
-          <Button className="col-span-4 md:col-span-2">Agregar nodo</Button>
+          <Button
+            className="col-span-4 md:col-span-2"
+            onClick={() => {
+              const tempValue = Number(newTemp);
+              if (!newName || isNaN(tempValue)) {
+                console.log('Nombre o temperatura inválidos');
+                return;
+              }
+
+              const newNode: TreeNode = {
+                name: newName,
+                attributes: {
+                  temp: tempValue,
+                  tempStr: tempValue.toFixed(4) + '°C',
+                  code: newName.slice(0, 3).toUpperCase(),
+                  flag: null,
+                  height: 1,
+                },
+                children: [{ name: '' }, { name: '' }],
+              };
+
+              const updatedTree = insert(treeData, newNode);
+              setTreeData(updatedTree);
+
+              console.log(
+                `Nodo agregado: ${newNode.name} (${newNode.attributes.code}, temp=${newNode.attributes.temp.toFixed(4)})`
+              );
+
+              setNewName('');
+              setNewTemp('');
+            }}
+          >
+            Agregar nodo
+          </Button>
 
           {/* Eliminación y búsqueda */}
           <Separator text="Eliminación y búsqueda de nodo por métrica" />
