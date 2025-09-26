@@ -69,7 +69,7 @@ export default function Home() {
           />
 
           <Button
-            className="col-span-1 md:col-span-2"
+            className="col-span-4 md:col-span-2"
             onClick={() => {
               const input = newNameOrCode.trim().toLowerCase();
               if (!input) {
@@ -84,34 +84,56 @@ export default function Home() {
                   c.code.trim().toLowerCase() === input
               );
 
+              // Si no existe, generar país nuevo
               if (!match) {
-                // Generar país nuevo
-                const randomTemps = Array.from({ length: 62 }, () =>
-                  Number((Math.random() * 2 - 1).toFixed(3))
-                );
-                const avg = Number(
-                  (
-                    randomTemps.reduce((sum, t) => sum + t, 0) /
-                    randomTemps.length
-                  ).toFixed(6)
-                );
+                const generateUniqueCountry = (): CountryData => {
+                  let avg = 0;
+                  let temps: number[] = [];
 
-                const newId = Math.max(...countries.map((c) => c.id)) + 1;
-                const newCode = input.slice(0, 3).toUpperCase();
+                  do {
+                    const base = Math.random() * 1.0 - 0.1; // base entre -0.1 y 0.9
+                    temps = Array.from({ length: 62 }, () => {
+                      const variation = (Math.random() - 0.5) * 0.4; // ±0.2
+                      const value = Math.min(
+                        0.9,
+                        Math.max(-0.1, base + variation)
+                      );
+                      return Number(value.toFixed(3));
+                    });
 
-                match = {
-                  id: newId,
-                  name: input.charAt(0).toUpperCase() + input.slice(1),
-                  code: newCode,
-                  temperatures: randomTemps,
-                  flag: '',
-                  avgTempChange: avg,
+                    avg = Number(
+                      (
+                        temps.reduce((sum, t) => sum + t, 0) / temps.length
+                      ).toFixed(6)
+                    );
+                  } while (findNodeByTemp(treeData, avg));
+
+                  const newId = Math.max(...countries.map((c) => c.id)) + 1;
+                  const newCode = input.slice(0, 3).toUpperCase();
+
+                  return {
+                    id: newId,
+                    name: input.charAt(0).toUpperCase() + input.slice(1),
+                    code: newCode,
+                    temperatures: temps,
+                    flag: '',
+                    avgTempChange: avg,
+                  };
                 };
 
+                match = generateUniqueCountry();
                 countries.push(match); // Simulado: en memoria
                 console.log(
                   `Nuevo país generado: ${match.name} (${match.code})`
                 );
+              }
+
+              // Verificar que el promedio no exista en el árbol (por si el país sí existía)
+              if (findNodeByTemp(treeData, match.avgTempChange)) {
+                console.log(
+                  `Ya existe un nodo con temp=${match.avgTempChange.toFixed(4)}. No se puede insertar duplicado.`
+                );
+                return;
               }
 
               const newNode: TreeNode = {
@@ -138,7 +160,6 @@ export default function Home() {
           >
             Agregar nodo
           </Button>
-
           {/* Eliminación y búsqueda */}
           <Separator text="Eliminación y búsqueda de nodo por métrica" />
           <Input
