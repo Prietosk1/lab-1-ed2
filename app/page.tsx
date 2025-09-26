@@ -20,6 +20,8 @@ import {
 } from './scripts/avlUtils';
 import { generateTreeData } from './scripts/generateTreeData';
 import { levelWalkthrough } from './scripts/buttonUtils';
+import dataset from '@/app/data/dataset_climate_change.json';
+import { CountryData } from './types/countryData';
 
 const DynamicAVLTree = dynamic(() => import('@/app/ui/AVLTree'), {
   ssr: false,
@@ -76,19 +78,31 @@ export default function Home() {
           <Button
             className="col-span-4 md:col-span-2"
             onClick={() => {
-              const tempValue = Number(newTemp);
-              if (!newName || isNaN(tempValue)) {
-                console.log('Nombre o temperatura inválidos');
+              const name = newName.trim().toLowerCase();
+              if (!name) {
+                console.log('Nombre inválido');
+                return;
+              }
+
+              const countries: CountryData[] = dataset as CountryData[];
+              const match = countries.find(
+                (c) => c.name.trim().toLowerCase() === name
+              );
+
+              if (!match) {
+                console.log(
+                  `No se encontró el país "${newName}" en el conjunto de datos`
+                );
                 return;
               }
 
               const newNode: TreeNode = {
-                name: newName,
+                name: match.name,
                 attributes: {
-                  temp: tempValue,
-                  tempStr: tempValue.toFixed(4) + '°C',
-                  code: newName.slice(0, 3).toUpperCase(),
-                  flag: null,
+                  temp: match.avgTempChange,
+                  tempStr: match.avgTempChange.toFixed(4) + '°C',
+                  code: match.code,
+                  flag: match.flag,
                   height: 1,
                 },
                 children: [{ name: '' }, { name: '' }],
@@ -98,7 +112,7 @@ export default function Home() {
               setTreeData(updatedTree);
 
               console.log(
-                `Nodo agregado: ${newNode.name} (${newNode.attributes.code}, temp=${newNode.attributes.temp.toFixed(4)})`
+                `Nodo agregado desde dataset: ${newNode.name} (${newNode.attributes.code}, temp=${newNode.attributes.temp.toFixed(4)})`
               );
 
               setNewName('');
