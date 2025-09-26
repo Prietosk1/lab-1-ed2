@@ -36,7 +36,7 @@ function formatNodeInfo(
   }
 }
 
-function levelWalkthrough(data: TreeNode): void {
+function levelWalkthrough(data: TreeNode): string[][] {
   const niveles = getLevelOrderRecursive(data);
 
   console.log('Recorrido por niveles:', niveles);
@@ -45,6 +45,7 @@ function levelWalkthrough(data: TreeNode): void {
   niveles.forEach((nivel, i) => {
     console.log(`Nivel ${i}: ${nivel.join(' ')}`);
   });
+  return niveles;
 }
 
 function searchNodeByAverageTemperature(data: TreeNode, avgTemp: number): void {

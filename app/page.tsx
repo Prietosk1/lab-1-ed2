@@ -29,6 +29,8 @@ import {
 } from './scripts/searchUtils';
 import Swal from 'sweetalert2';
 
+import iso from 'iso-3166-1';
+
 const DynamicAVLTree = dynamic(() => import('@/app/ui/AVLTree'), {
   ssr: false,
 });
@@ -60,6 +62,7 @@ export default function Home() {
   const [searchResults, setSearchResults] = useState<TreeNode[]>([]);
   const [selectedNode, setSelectedNode] = useState<TreeNode | null>(null);
   const [nodeInfo, setNodeInfo] = useState<string>('');
+  const [nivelesRecorrido, setNivelesRecorrido] = useState<string[][]>([]);
 
   return (
     <>
@@ -272,102 +275,6 @@ export default function Home() {
             Buscar por temperatura media
           </Button>
 
-          {searchResults.length > 0 && (
-            <select
-              className="bg-accent col-span-2 cursor-pointer rounded p-2 text-xs font-bold text-gray-300 transition-all duration-150 ease-in outline-none hover:scale-103"
-              value={selectedNode?.attributes.code || ''}
-              onChange={(e) => {
-                const selected = searchResults.find(
-                  (n) => n.attributes.code === e.target.value
-                );
-                setSelectedNode(selected || null);
-                setNodeInfo('');
-              }}
-            >
-              <option value="">Seleccionar nodo</option>
-              {searchResults.map((node) => (
-                <option key={node.attributes.code} value={node.attributes.code}>
-                  {node.name} ({node.attributes.code})
-                </option>
-              ))}
-            </select>
-          )}
-
-          {selectedNode && (
-            <>
-              <Separator text="Operaciones disponibles" />
-              <Button
-                className="col-span-1"
-                variant="secondary"
-                onClick={() => {
-                  const nivel = getNodeLevel(treeData, selectedNode);
-                  setNodeInfo(`Nivel del nodo: ${nivel}`);
-                  console.log(
-                    `Nivel del nodo ${selectedNode.name} (${selectedNode.attributes.code}, temp=${selectedNode.attributes.avegTemp.toFixed(4)}): ${nivel}`
-                  );
-                }}
-              >
-                Nivel
-              </Button>
-
-              <Button
-                className="col-span-1"
-                onClick={() => {
-                  const padre = getParent(treeData, selectedNode);
-                  setNodeInfo(
-                    `Nodo padre: ${padre?.name} - ${padre?.attributes.code}`
-                  );
-                  formatNodeInfo(padre, 'Padre', selectedNode);
-                }}
-              >
-                Padre
-              </Button>
-
-              <Button
-                className="col-span-1"
-                onClick={() => {
-                  const abuelo = getGrandparent(treeData, selectedNode);
-                  setNodeInfo(
-                    `Nodo abuelo: ${abuelo?.name} - ${abuelo?.attributes.code}`
-                  );
-                  formatNodeInfo(abuelo, 'Abuelo', selectedNode);
-                }}
-              >
-                Abuelo
-              </Button>
-
-              <Button
-                className="col-span-1"
-                variant="secondary"
-                onClick={() => {
-                  const tio = getUncle(treeData, selectedNode);
-                  setNodeInfo(
-                    `Nodo tio: ${tio?.name} - ${tio?.attributes.code}`
-                  );
-                  formatNodeInfo(tio, 'Tío', selectedNode);
-                }}
-              >
-                Tío
-              </Button>
-              <Button
-                className="col-span-2"
-                variant="secondary"
-                onClick={() => {
-                  const balance = getBalance(selectedNode);
-                  setNodeInfo(`Factor de balance: ${balance}`);
-                  console.log(
-                    `Balance del nodo ${selectedNode.name} (${selectedNode.attributes.code}, temp=${selectedNode.attributes.avegTemp.toFixed(4)}): ${balance}`
-                  );
-                }}
-              >
-                Factor de balanceo
-              </Button>
-              <p className="col-span-2 px-5 text-center text-xs font-bold break-words">
-                {nodeInfo !== '' ? nodeInfo : '...'}
-              </p>
-            </>
-          )}
-
           <Separator text="Búsqueda por temperatura promedio de año" />
 
           <Input
@@ -481,14 +388,108 @@ export default function Home() {
             Mayor al promedio del año
           </Button>
 
+          {searchResults.length > 0 && (
+            <>
+              <Separator text="Operaciones disponibles" />
+              <select
+                className="bg-accent col-span-2 cursor-pointer rounded p-2 text-xs font-bold text-gray-300 transition-all duration-150 ease-in outline-none hover:scale-103"
+                value={selectedNode?.attributes.code || ''}
+                onChange={(e) => {
+                  const selected = searchResults.find(
+                    (n) => n.attributes.code === e.target.value
+                  );
+                  setSelectedNode(selected || null);
+                  setNodeInfo('');
+                }}
+              >
+                <option value="">Seleccionar nodo</option>
+                {searchResults.map((node) => (
+                  <option
+                    key={node.attributes.code}
+                    value={node.attributes.code}
+                  >
+                    {node.name} ({node.attributes.code})
+                  </option>
+                ))}
+              </select>
+            </>
+          )}
+
+          {selectedNode && (
+            <>
+              <Button
+                className="col-span-1"
+                variant="secondary"
+                onClick={() => {
+                  const nivel = getNodeLevel(treeData, selectedNode);
+                  setNodeInfo(`Nivel del nodo: ${nivel}`);
+                  console.log(
+                    `Nivel del nodo ${selectedNode.name} (${selectedNode.attributes.code}, temp=${selectedNode.attributes.avegTemp.toFixed(4)}): ${nivel}`
+                  );
+                }}
+              >
+                Nivel
+              </Button>
+
+              <Button
+                className="col-span-1"
+                onClick={() => {
+                  const padre = getParent(treeData, selectedNode);
+                  setNodeInfo(
+                    `Nodo padre: ${padre?.name} - ${padre?.attributes.code}`
+                  );
+                  formatNodeInfo(padre, 'Padre', selectedNode);
+                }}
+              >
+                Padre
+              </Button>
+
+              <Button
+                className="col-span-1"
+                onClick={() => {
+                  const abuelo = getGrandparent(treeData, selectedNode);
+                  setNodeInfo(
+                    `Nodo abuelo: ${abuelo?.name} - ${abuelo?.attributes.code}`
+                  );
+                  formatNodeInfo(abuelo, 'Abuelo', selectedNode);
+                }}
+              >
+                Abuelo
+              </Button>
+
+              <Button
+                className="col-span-1"
+                variant="secondary"
+                onClick={() => {
+                  const tio = getUncle(treeData, selectedNode);
+                  setNodeInfo(
+                    `Nodo tio: ${tio?.name} - ${tio?.attributes.code}`
+                  );
+                  formatNodeInfo(tio, 'Tío', selectedNode);
+                }}
+              >
+                Tío
+              </Button>
+              <Button
+                className="col-span-2"
+                variant="secondary"
+                onClick={() => {
+                  const balance = getBalance(selectedNode);
+                  setNodeInfo(`Factor de balance: ${balance}`);
+                  console.log(
+                    `Balance del nodo ${selectedNode.name} (${selectedNode.attributes.code}, temp=${selectedNode.attributes.avegTemp.toFixed(4)}): ${balance}`
+                  );
+                }}
+              >
+                Factor de balanceo
+              </Button>
+              <p className="col-span-2 px-5 text-center text-xs font-bold break-words">
+                {nodeInfo !== '' ? nodeInfo : '...'}
+              </p>
+            </>
+          )}
+
           <Separator text="Operaciones con el arbol" />
-          <Button
-            onClick={() => levelWalkthrough(treeData)}
-            variant="primary"
-            className="col-span-2"
-          >
-            Hacer Recorrido Por Niveles
-          </Button>
 
           <Button
             className="col-span-2"
@@ -505,6 +506,42 @@ export default function Home() {
           >
             Reiniciar arbol
           </Button>
+          <Button
+            onClick={() =>
+              setNivelesRecorrido(levelWalkthrough(displayTreeData))
+            }
+            variant="primary"
+            className="col-span-2"
+          >
+            Hacer Recorrido Por Niveles
+          </Button>
+
+          {nivelesRecorrido.map((row, rowIndex) => (
+            <div key={rowIndex} className="col-span-2 mb-4">
+              <p className="text-accent font-semibold">Nivel {rowIndex + 1}</p>
+              <div className="grid grid-cols-5 items-center justify-center">
+                {row.map((col, colIndex) => {
+                  const iso2 = iso.whereAlpha3(col)?.alpha2?.toLowerCase();
+                  return (
+                    <div
+                      key={colIndex}
+                      className="m-2 flex items-center justify-center space-x-2"
+                    >
+                      <img
+                        src={`https://flagcdn.com/w20/${iso2}.png`}
+                        alt="Flag"
+                        width={40}
+                        height={40}
+                      />
+                      <span className="text-center text-xs font-bold break-words">
+                        {col}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Visualización del árbol */}
