@@ -492,6 +492,15 @@ export default function Home() {
           <Separator text="Operaciones con el arbol" />
 
           <Button
+            onClick={() =>
+              setNivelesRecorrido(levelWalkthrough(displayTreeData))
+            }
+            variant="primary"
+            className="col-span-2"
+          >
+            Hacer Recorrido Por Niveles
+          </Button>
+          <Button
             className="col-span-2"
             onClick={() => {
               setDisplayTreeData(treeData);
@@ -507,13 +516,32 @@ export default function Home() {
             Reiniciar arbol
           </Button>
           <Button
-            onClick={() =>
-              setNivelesRecorrido(levelWalkthrough(displayTreeData))
-            }
-            variant="primary"
             className="col-span-2"
+            variant="primary"
+            onClick={() => {
+              // Reiniciar el árbol a estado vacío
+              const emptyTree: TreeNode = {
+                name: '',
+                attributes: {
+                  avegTemp: 0,
+                  tempStr: '',
+                  code: '',
+                  flag: '',
+                  height: 0,
+                },
+                children: [{ name: '' }, { name: '' }],
+              };
+              setDisplayTreeData(emptyTree);
+              setTreeData(emptyTree); // Actualiza el árbol
+              setSearchResults([]); // Limpia resultados de búsqueda
+              setSelectedNode(null); // Limpia selección de nodo
+
+              console.log(
+                'Árbol limpiado. Todos los nodos han sido eliminados.'
+              );
+            }}
           >
-            Hacer Recorrido Por Niveles
+            Limpiar árbol
           </Button>
 
           {nivelesRecorrido.map((row, rowIndex) => (
