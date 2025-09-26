@@ -209,30 +209,30 @@ export default function Home() {
           <Button
             className="col-span-1"
             onClick={() => {
-              // deleteCountry(treeData, Number(temp), setTreeData);
-              const tempValue = Number(temp);
-              const nodeToDelete = findNodeByTemp(treeData, tempValue);
+              deleteCountry(treeData, Number(temp), setTreeData, setTemp);
+              // const tempValue = Number(temp);
+              // const nodeToDelete = findNodeByTemp(treeData, tempValue);
 
-              if (!nodeToDelete) {
-                const msg = `No se encontró ningún nodo con temp=${tempValue.toFixed(5)}`;
-                console.log(msg);
-                setDeletedMessage(msg);
-                return;
-              }
-              Swal.fire({
-                title: 'Nodo eliminado con exito!',
-                text: 'Do you want to continue',
-                icon: 'success',
-                confirmButtonText: 'Cool',
-              });
+              // if (!nodeToDelete) {
+              //   const msg = `No se encontró ningún nodo con temp=${tempValue.toFixed(5)}`;
+              //   console.log(msg);
+              //   setDeletedMessage(msg);
+              //   return;
+              // }
+              // Swal.fire({
+              //   title: 'Nodo eliminado con exito!',
+              //   text: 'Do you want to continue',
+              //   icon: 'success',
+              //   confirmButtonText: 'Cool',
+              // });
 
-              const msg = `Nodo eliminado: ${nodeToDelete.name} (${nodeToDelete.attributes.code}, temp=${nodeToDelete.attributes.avegTemp.toFixed(5)})`;
-              console.log(msg);
-              const updatedTree = deleteNode(treeData, tempValue);
-              setTreeData(updatedTree! as TreeNode);
-              setTreeData(treeData);
+              // const msg = `Nodo eliminado: ${nodeToDelete.name} (${nodeToDelete.attributes.code}, temp=${nodeToDelete.attributes.avegTemp.toFixed(5)})`;
+              // console.log(msg);
+              // const updatedTree = deleteNode(treeData, tempValue);
+              // setTreeData(updatedTree! as TreeNode);
+              // setTreeData(treeData);
 
-              setTemp('');
+              // setTemp('');
             }}
           >
             Eliminar

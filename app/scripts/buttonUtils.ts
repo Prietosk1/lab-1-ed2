@@ -17,6 +17,7 @@ import {
   searchBelowGlobalAverage,
   searchByMinAvgTemp,
 } from './searchUtils';
+import Swal from 'sweetalert2';
 
 function formatNodeInfo(
   relative: TreeNode | null,
@@ -60,20 +61,29 @@ function searchNodeByAverageTemperature(data: TreeNode, avgTemp: number): void {
 function deleteCountry(
   data: TreeNode,
   temp: number,
-  setTreeData: Function
+  setTreeData: Function,
+  setTemp: Function
 ): void {
-  const node = findNodeByTemp(data, temp);
+  const nodeToDelete = findNodeByTemp(data, temp);
 
-  if (!node) {
-    console.log(`No se encontró ningún nodo con temp=${temp}`);
+  if (!nodeToDelete) {
+    const msg = `No se encontró ningún nodo con temp=${temp.toFixed(5)}`;
+    console.log(msg);
     return;
-    // setDeletedMessage(msg);
   }
+  Swal.fire({
+    title: 'Nodo eliminado con exito!',
+    text: 'Do you want to continue',
+    icon: 'success',
+    confirmButtonText: 'Cool',
+  });
 
-  const msg = `Nodo eliminado: ${node.name} (${node.attributes.code}, temp=${temp})`;
+  const msg = `Nodo eliminado: ${nodeToDelete.name} (${nodeToDelete.attributes.code}, temp=${nodeToDelete.attributes.avegTemp.toFixed(5)})`;
   console.log(msg);
   const updatedTree = deleteNode(data, temp);
-  setTreeData(updatedTree);
+  setTreeData(updatedTree! as TreeNode);
+
+  setTemp('');
 }
 
 function findNodeLevel(data: TreeNode, temp: number) {
