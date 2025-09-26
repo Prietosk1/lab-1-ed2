@@ -18,8 +18,7 @@ import {
   deleteNode,
 } from './scripts/avlUtils';
 import { generateTreeData } from './scripts/generateTreeData';
-import { searchNode } from './scripts/avlUtils';
-import { levelWalkthrogh } from './scripts/buttonUtils';
+import { levelWalkthrough } from './scripts/buttonUtils';
 
 const DynamicAVLTree = dynamic(() => import('@/app/ui/AVLTree'), {
   ssr: false,
@@ -140,7 +139,7 @@ export default function Home() {
           {/* Recorrido por niveles */}
           <Separator text="Recorrido" />
           <Button
-            onClick={() => levelWalkthrogh(treeData)}
+            onClick={() => levelWalkthrough(treeData)}
             variant="primary"
             className="col-span-2"
           >
