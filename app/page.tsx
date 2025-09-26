@@ -8,7 +8,16 @@ import DecimalSlider from '@/app/ui/DecimalSlider';
 import { useState } from 'react';
 import { TreeNode } from '@/app/types/treeNode';
 import { generateTreeData } from '@/app/scripts/generateTreeData';
+import { findNodeByTemp, insert } from './scripts/avlUtils';
+import dataset from '@/app/data/dataset_climate_change.json';
+import { CountryData } from './types/countryData';
 import {
+  searchAboveYearAverage,
+  searchBelowGlobalAverage,
+  searchByMinAvgTemp,
+} from './scripts/searchUtils';
+import {
+  addNode,
   deleteCountry,
   findNodeBalance,
   findNodeGrandparent,
@@ -16,7 +25,10 @@ import {
   findNodeParent,
   findNodeUncle,
   levelWalkthrough,
+  searchNodeAboveAvg,
+  searchNodeBelowAvg,
   searchNodeByAverageTemperature,
+  searchNodeByMinAvgTemperature,
 } from '@/app/scripts/buttonUtils';
 
 const DynamicAVLTree = dynamic(() => import('@/app/ui/AVLTree'), {
@@ -27,6 +39,13 @@ export default function Home() {
   const [treeData, setTreeData] = useState<TreeNode>(generateTreeData());
   const [temp, setTemp] = useState<string>('0.01');
   const [deletedMessage, setDeletedMessage] = useState<string | null>(null);
+  const [newName, setNewName] = useState<string>('');
+  const [newTemp, setNewTemp] = useState<string>('');
+  const [newNameOrCode, setNewNameOrCode] = useState<string>('');
+  const [searchYear, setSearchYear] = useState<number>(2022);
+  const [minAvgTemp, setMinAvgTemp] = useState<number>(0.5);
+  const [searchResults, setSearchResults] = useState<TreeNode[]>([]);
+  const [selectedNode, setSelectedNode] = useState<TreeNode | null>(null);
 
   return (
     <>
@@ -36,19 +55,22 @@ export default function Home() {
           {/* Inserccion */}
           <Separator text="Inserción de pais" />
           <Input
-            label="Nombre"
+            label="Nombre o código ISO"
             type="text"
-            className="col-span-2 md:col-span-1"
-            placeholder="Colombia"
+            className="col-span-2"
+            placeholder="Colombia o COL"
+            value={newNameOrCode}
+            onChange={(e) => setNewNameOrCode(e.target.value)}
           />
-          <Input
-            label="Temperatura media"
-            className="col-span-2 md:col-span-1"
-            type="number"
-            placeholder="0.723"
-          />
-          <Button className="col-span-4 md:col-span-2">Agregar nodo</Button>
 
+          <Button
+            className="col-span-4 md:col-span-2"
+            onClick={() =>
+              addNode(newNameOrCode, treeData, setTreeData, setNewNameOrCode)
+            }
+          >
+            Agregar nodo
+          </Button>
           {/* Eliminación y búsqueda */}
           <Separator text="Eliminación y búsqueda de nodo por métrica" />
           <Input
@@ -59,8 +81,6 @@ export default function Home() {
             placeholder="0.001"
             type="number"
           />
-
-          {/* Buscar */}
           <Button
             onClick={() =>
               searchNodeByAverageTemperature(treeData, Number(temp))
@@ -79,21 +99,72 @@ export default function Home() {
             Eliminar
           </Button>
 
-          {/* Búsqueda por temperatura promedio de año */}
           <Separator text="Búsqueda por temperatura promedio de año" />
+
           <Input
-            className="col-span-4 md:col-span-2"
+            className="col-span-2 md:col-span-2"
             label="Año"
             type="number"
-            placeholder="2022"
+            value={searchYear}
+            onChange={(e) => setSearchYear(Number(e.target.value))}
             max={2022}
             min={1961}
             maxLength={4}
           />
-          <Button className="col-span-2">Menor al promedio</Button>
-          <Button variant="secondary" className="col-span-2">
-            Mayor al promedio
+
+          <Button
+            className="col-span-1"
+            onClick={() =>
+              searchNodeBelowAvg(
+                treeData,
+                searchYear,
+                setSearchResults,
+                setSelectedNode
+              )
+            }
+          >
+            Menor al promedio global
           </Button>
+
+          <Button
+            variant="secondary"
+            className="col-span-1"
+            onClick={() =>
+              searchNodeAboveAvg(
+                treeData,
+                searchYear,
+                setSearchResults,
+                setSelectedNode
+              )
+            }
+          >
+            Mayor al promedio del año
+          </Button>
+
+          <Separator text="Búsqueda por temperatura media mínima" />
+
+          <Input
+            className="col-span-2 md:col-span-2"
+            label="Temperatura mínima"
+            type="number"
+            value={minAvgTemp}
+            onChange={(e) => setMinAvgTemp(Number(e.target.value))}
+          />
+
+          <Button
+            className="col-span-2"
+            onClick={() =>
+              searchNodeByMinAvgTemperature(
+                treeData,
+                minAvgTemp,
+                setSearchResults,
+                setSelectedNode
+              )
+            }
+          >
+            Buscar por temperatura media
+          </Button>
+
           {/* Recorrido por niveles */}
           <Separator text="Recorrido" />
           <Button
