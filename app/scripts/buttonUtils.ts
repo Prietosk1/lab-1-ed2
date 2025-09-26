@@ -8,7 +8,7 @@ function levelWalkthrough(data: TreeNode) {
 
   // Mostrar cada nivel en consola
   niveles.forEach((nivel, i) => {
-    console.log(`Nivel ${i + 1}: ${nivel.join(' ')}`);
+    console.log(`Nivel ${i}: ${nivel.join(' ')}`);
   });
 }
 

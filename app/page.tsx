@@ -22,6 +22,11 @@ import { generateTreeData } from './scripts/generateTreeData';
 import { levelWalkthrough } from './scripts/buttonUtils';
 import dataset from '@/app/data/dataset_climate_change.json';
 import { CountryData } from './types/countryData';
+import {
+  searchAboveYearAverage,
+  searchBelowGlobalAverage,
+  searchByMinAvgTemp,
+} from './scripts/searchUtils';
 
 const DynamicAVLTree = dynamic(() => import('@/app/ui/AVLTree'), {
   ssr: false,
@@ -51,6 +56,10 @@ export default function Home() {
   const [newName, setNewName] = useState('');
   const [newTemp, setNewTemp] = useState('');
   const [newNameOrCode, setNewNameOrCode] = useState('');
+  const [searchYear, setSearchYear] = useState<number>(2022);
+  const [minAvgTemp, setMinAvgTemp] = useState<number>(0.5);
+  const [searchResults, setSearchResults] = useState<TreeNode[]>([]);
+  const [selectedNode, setSelectedNode] = useState<TreeNode | null>(null);
 
   return (
     <>
@@ -170,18 +179,22 @@ export default function Home() {
             placeholder="0.001"
             type="number"
           />
-
-          {/* Buscar */}
           <Button
             onClick={() => {
-              const node = findNodeByTemp(treeData, Number(temp));
+              const tempValue = Number(temp);
+              const node = findNodeByTemp(treeData, tempValue);
+
               if (node) {
+                setSearchResults([node]); // Solo ese nodo en el combo
+                setSelectedNode(node); // Selección automática
                 console.log(
                   `Nodo encontrado: ${node.name} (${node.attributes.code}, temp=${node.attributes.temp.toFixed(4)})`
                 );
               } else {
+                setSearchResults([]);
+                setSelectedNode(null);
                 console.log(
-                  `No se encontró ningún nodo con temp=${Number(temp).toFixed(4)}`
+                  `No se encontró ningún nodo con temp=${tempValue.toFixed(4)}`
                 );
               }
             }}
@@ -215,20 +228,86 @@ export default function Home() {
             Eliminar
           </Button>
 
-          {/* Búsqueda por temperatura promedio de año */}
           <Separator text="Búsqueda por temperatura promedio de año" />
+
           <Input
-            className="col-span-4 md:col-span-2"
+            className="col-span-2 md:col-span-2"
             label="Año"
             type="number"
-            placeholder="2022"
+            value={searchYear}
+            onChange={(e) => setSearchYear(Number(e.target.value))}
             max={2022}
             min={1961}
           />
-          <Button className="col-span-2">Menor al promedio</Button>
-          <Button variant="secondary" className="col-span-2">
-            Mayor al promedio
+
+          <Button
+            className="col-span-1"
+            onClick={() => {
+              const results = searchBelowGlobalAverage(treeData, searchYear);
+              setSearchResults(results);
+              setSelectedNode(null); // Limpia selección previa
+
+              if (results.length === 1) {
+                setSelectedNode(results[0]); // Selección automática
+              }
+
+              console.log(
+                `Nodos con temp < promedio global en ${searchYear}:`,
+                results
+              );
+            }}
+          >
+            Menor al promedio global
           </Button>
+
+          <Button
+            variant="secondary"
+            className="col-span-1"
+            onClick={() => {
+              const results = searchAboveYearAverage(treeData, searchYear);
+              setSearchResults(results);
+              setSelectedNode(null); // Limpia selección previa
+
+              if (results.length === 1) {
+                setSelectedNode(results[0]); // Selección automática
+              }
+
+              console.log(
+                `Nodos con temp > promedio en ${searchYear}:`,
+                results
+              );
+            }}
+          >
+            Mayor al promedio del año
+          </Button>
+
+          <Separator text="Búsqueda por temperatura media mínima" />
+
+          <Input
+            className="col-span-2 md:col-span-2"
+            label="Temperatura mínima"
+            type="number"
+            value={minAvgTemp}
+            onChange={(e) => setMinAvgTemp(Number(e.target.value))}
+          />
+
+          <Button
+            className="col-span-2"
+            onClick={() => {
+              const results = searchByMinAvgTemp(treeData, minAvgTemp);
+              setSearchResults(results);
+              setSelectedNode(null); // Limpia selección previa
+
+              if (results.length === 1) {
+                setSelectedNode(results[0]); // Selección automática
+              }
+
+              console.log(`Nodos con temp media >= ${minAvgTemp}:`, results);
+            }}
+          >
+            Buscar por temperatura media
+          </Button>
+
           {/* Recorrido por niveles */}
           <Separator text="Recorrido" />
           <Button
@@ -239,92 +318,89 @@ export default function Home() {
             Hacer Recorrido Por Niveles
           </Button>
 
-          {/* Operaciones sobre nodo */}
-          <Separator text="Operaciones sobre nodo (por métrica)" />
+          <Separator text="Operaciones sobre nodo seleccionado" />
 
-          {/* a. Nivel */}
-          <Button
-            className="col-span-2"
-            onClick={() => {
-              const node = findNodeByTemp(treeData, Number(temp));
-              if (node) {
-                const nivel = getNodeLevel(treeData, node);
-                console.log(
-                  `Nivel del nodo ${node.name} (${node.attributes.code}, temp=${node.attributes.temp}): ${nivel}`
+          {searchResults.length > 0 && (
+            <select
+              className="col-span-2 rounded bg-white p-2 text-black"
+              value={selectedNode?.attributes.code || ''}
+              onChange={(e) => {
+                const selected = searchResults.find(
+                  (n) => n.attributes.code === e.target.value
                 );
-              } else {
-                console.log('Nodo no encontrado');
-              }
-            }}
-          >
-            a. Obtener nivel
-          </Button>
+                setSelectedNode(selected || null);
+              }}
+            >
+              <option value="">Seleccionar nodo</option>
+              {searchResults.map((node) => (
+                <option key={node.attributes.code} value={node.attributes.code}>
+                  {node.name} ({node.attributes.code})
+                </option>
+              ))}
+            </select>
+          )}
 
-          {/* b. Balance */}
-          <Button
-            className="col-span-2"
-            onClick={() => {
-              const node = findNodeByTemp(treeData, Number(temp));
-              if (node) {
-                const balance = getBalance(node);
-                console.log(
-                  `Balance del nodo ${node.name} (${node.attributes.code}, temp=${node.attributes.temp}): ${balance}`
-                );
-              } else {
-                console.log('Nodo no encontrado');
-              }
-            }}
-          >
-            b. Factor de balanceo
-          </Button>
+          {selectedNode ? (
+            <>
+              <Button
+                className="col-span-2"
+                onClick={() => {
+                  const nivel = getNodeLevel(treeData, selectedNode);
+                  console.log(
+                    `Nivel del nodo ${selectedNode.name} (${selectedNode.attributes.code}, temp=${selectedNode.attributes.temp.toFixed(4)}): ${nivel}`
+                  );
+                }}
+              >
+                a. Nivel
+              </Button>
 
-          {/* c. Padre */}
-          <Button
-            className="col-span-2"
-            onClick={() => {
-              const node = findNodeByTemp(treeData, Number(temp));
-              if (node) {
-                const padre = getParent(treeData, node);
-                formatNodeInfo(padre, 'Padre', node);
-              } else {
-                console.log('Nodo no encontrado');
-              }
-            }}
-          >
-            c. Padre
-          </Button>
+              <Button
+                className="col-span-2"
+                onClick={() => {
+                  const balance = getBalance(selectedNode);
+                  console.log(
+                    `Balance del nodo ${selectedNode.name} (${selectedNode.attributes.code}, temp=${selectedNode.attributes.temp.toFixed(4)}): ${balance}`
+                  );
+                }}
+              >
+                b. Balance
+              </Button>
 
-          {/* d. Abuelo */}
-          <Button
-            className="col-span-2"
-            onClick={() => {
-              const node = findNodeByTemp(treeData, Number(temp));
-              if (node) {
-                const abuelo = getGrandparent(treeData, node);
-                formatNodeInfo(abuelo, 'Abuelo', node);
-              } else {
-                console.log('Nodo no encontrado');
-              }
-            }}
-          >
-            d. Abuelo
-          </Button>
+              <Button
+                className="col-span-2"
+                onClick={() => {
+                  const padre = getParent(treeData, selectedNode);
+                  formatNodeInfo(padre, 'Padre', selectedNode);
+                }}
+              >
+                c. Padre
+              </Button>
 
-          {/* e. Tío */}
-          <Button
-            className="col-span-2"
-            onClick={() => {
-              const node = findNodeByTemp(treeData, Number(temp));
-              if (node) {
-                const tio = getUncle(treeData, node);
-                formatNodeInfo(tio, 'Tío', node);
-              } else {
-                console.log('Nodo no encontrado');
-              }
-            }}
-          >
-            e. Tío
-          </Button>
+              <Button
+                className="col-span-2"
+                onClick={() => {
+                  const abuelo = getGrandparent(treeData, selectedNode);
+                  formatNodeInfo(abuelo, 'Abuelo', selectedNode);
+                }}
+              >
+                d. Abuelo
+              </Button>
+
+              <Button
+                className="col-span-2"
+                onClick={() => {
+                  const tio = getUncle(treeData, selectedNode);
+                  formatNodeInfo(tio, 'Tío', selectedNode);
+                }}
+              >
+                e. Tío
+              </Button>
+            </>
+          ) : (
+            <div className="col-span-2 text-sm font-medium text-red-600">
+              No hay nodo seleccionado para operar.
+            </div>
+          )}
 
           {/* Configuraciones visuales */}
           <Separator text="Configuraciones visuales" />

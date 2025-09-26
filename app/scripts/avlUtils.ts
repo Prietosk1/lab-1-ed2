@@ -77,7 +77,6 @@ function collectLevel(node: TreeNode, level: number, acc: string[]): void {
   if (level === 1) {
     acc.push(node.attributes.code); // ISO3 del país
   } else {
-    console.log(node.attributes.temp + '\n');
     collectLevel(node.children[0] as TreeNode, level - 1, acc);
     collectLevel(node.children[1] as TreeNode, level - 1, acc);
   }
