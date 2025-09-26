@@ -52,15 +52,14 @@ function formatNodeInfo(
 
 export default function Home() {
   const [treeData, setTreeData] = useState<TreeNode>(generateTreeData());
-  const [temp, setTemp] = useState<string>('0.01');
-  const [deletedMessage, setDeletedMessage] = useState<string | null>(null);
-  const [newName, setNewName] = useState('');
-  const [newTemp, setNewTemp] = useState('');
+  const [displayTreeData, setDisplayTreeData] =
+    useState<TreeNode>(generateTreeData());
+  const [temp, setTemp] = useState<string>('');
   const [newNameOrCode, setNewNameOrCode] = useState('');
-  const [searchYear, setSearchYear] = useState<number>(2022);
-  const [minAvgTemp, setMinAvgTemp] = useState<number>(0.5);
+  const [searchYear, setSearchYear] = useState<string>('');
   const [searchResults, setSearchResults] = useState<TreeNode[]>([]);
   const [selectedNode, setSelectedNode] = useState<TreeNode | null>(null);
+  const [nodeInfo, setNodeInfo] = useState<string>('');
 
   return (
     <>
@@ -77,13 +76,28 @@ export default function Home() {
             value={newNameOrCode}
             onChange={(e) => setNewNameOrCode(e.target.value)}
           />
-
+          {/* Agregar nodo */}
           <Button
             className="col-span-4 md:col-span-2"
             onClick={() => {
               const input = newNameOrCode.trim().toLowerCase();
-              if (!input) {
-                console.log('Entrada inválida');
+              if (!input || input === '') {
+                Swal.fire({
+                  title: 'Campo vacio',
+                  text: `Opps... El campo esta vacio, por favor ingrese un nombre`,
+                  icon: 'error',
+                  confirmButtonText: 'Okay',
+                });
+                return;
+              }
+
+              if (input.length < 3) {
+                Swal.fire({
+                  title: 'Nombre invalido',
+                  text: `Opps.. El nombre ingresado debe ser mayor de 3 letras, por favor intente nuevamente.`,
+                  icon: 'info',
+                  confirmButtonText: 'Okay',
+                });
                 return;
               }
 
@@ -160,6 +174,7 @@ export default function Home() {
 
               const updatedTree = insert(treeData, newNode);
               setTreeData(updatedTree);
+              setDisplayTreeData(updatedTree);
 
               console.log(
                 `Nodo agregado: ${newNode.name} (${newNode.attributes.code}, temp=${newNode.attributes.avegTemp.toFixed(4)})`
@@ -176,10 +191,11 @@ export default function Home() {
             value={temp}
             onChange={(e) => setTemp(e.target.value)}
             className="col-span-2"
-            label="Métrica"
+            label="Temperatura"
             placeholder="0.001"
             type="number"
           />
+          {/* Buscar */}
           <Button
             onClick={() => {
               const tempValue = Number(temp);
@@ -188,15 +204,21 @@ export default function Home() {
               if (node) {
                 setSearchResults([node]); // Solo ese nodo en el combo
                 setSelectedNode(node); // Selección automática
-                console.log(
-                  `Nodo encontrado: ${node.name} (${node.attributes.code}, temp=${node.attributes.avegTemp.toFixed(4)})`
-                );
+                Swal.fire({
+                  title: 'Nodo encontrado con exito!',
+                  text: `Se ha encontrado ${node.name} - ${node.attributes.code}, acontinuación puede realizar sus respectivas operaciones.`,
+                  icon: 'success',
+                  confirmButtonText: 'Okay',
+                });
               } else {
                 setSearchResults([]);
                 setSelectedNode(null);
-                console.log(
-                  `No se encontró ningún nodo con temp=${tempValue.toFixed(4)}`
-                );
+                Swal.fire({
+                  title: 'Nodo no encontrado...',
+                  text: `Opps... Parece que no se encontro ningun nodo con dicha temperatura, intenta nuevamente!`,
+                  icon: 'error',
+                  confirmButtonText: 'Okay',
+                });
               }
             }}
             variant="secondary"
@@ -209,136 +231,57 @@ export default function Home() {
           <Button
             className="col-span-1"
             onClick={() => {
-              deleteCountry(treeData, Number(temp), setTreeData, setTemp);
-              // const tempValue = Number(temp);
-              // const nodeToDelete = findNodeByTemp(treeData, tempValue);
-
-              // if (!nodeToDelete) {
-              //   const msg = `No se encontró ningún nodo con temp=${tempValue.toFixed(5)}`;
-              //   console.log(msg);
-              //   setDeletedMessage(msg);
-              //   return;
-              // }
-              // Swal.fire({
-              //   title: 'Nodo eliminado con exito!',
-              //   text: 'Do you want to continue',
-              //   icon: 'success',
-              //   confirmButtonText: 'Cool',
-              // });
-
-              // const msg = `Nodo eliminado: ${nodeToDelete.name} (${nodeToDelete.attributes.code}, temp=${nodeToDelete.attributes.avegTemp.toFixed(5)})`;
-              // console.log(msg);
-              // const updatedTree = deleteNode(treeData, tempValue);
-              // setTreeData(updatedTree! as TreeNode);
-              // setTreeData(treeData);
-
-              // setTemp('');
+              deleteCountry(
+                treeData,
+                Number(temp),
+                setTreeData,
+                setTemp,
+                setDisplayTreeData
+              );
             }}
           >
             Eliminar
           </Button>
-
-          <Separator text="Búsqueda por temperatura promedio de año" />
-
-          <Input
-            className="col-span-2 md:col-span-2"
-            label="Año"
-            type="number"
-            value={searchYear}
-            onChange={(e) => setSearchYear(Number(e.target.value))}
-            max={2022}
-            min={1961}
-          />
-
-          <Button
-            className="col-span-1"
-            onClick={() => {
-              const results = searchBelowGlobalAverage(treeData, searchYear);
-              setSearchResults(results);
-              setSelectedNode(null); // Limpia selección previa
-
-              if (results.length === 1) {
-                setSelectedNode(results[0]); // Selección automática
-              }
-
-              console.log(
-                `Nodos con temp < promedio global en ${searchYear}:`,
-                results
-              );
-            }}
-          >
-            Menor al promedio global
-          </Button>
-
-          <Button
-            variant="secondary"
-            className="col-span-1"
-            onClick={() => {
-              const results = searchAboveYearAverage(treeData, searchYear);
-              setSearchResults(results);
-              setSelectedNode(null); // Limpia selección previa
-
-              if (results.length === 1) {
-                setSelectedNode(results[0]); // Selección automática
-              }
-
-              console.log(
-                `Nodos con temp > promedio en ${searchYear}:`,
-                results
-              );
-            }}
-          >
-            Mayor al promedio del año
-          </Button>
-
-          <Separator text="Búsqueda por temperatura media mínima" />
-
-          <Input
-            className="col-span-2 md:col-span-2"
-            label="Temperatura mínima"
-            type="number"
-            value={minAvgTemp}
-            onChange={(e) => setMinAvgTemp(Number(e.target.value))}
-          />
-
+          {/* Temperatura media */}
           <Button
             className="col-span-2"
             onClick={() => {
-              const results = searchByMinAvgTemp(treeData, minAvgTemp);
+              const results = searchByMinAvgTemp(treeData, Number(temp));
               setSearchResults(results);
               setSelectedNode(null); // Limpia selección previa
 
               if (results.length === 1) {
                 setSelectedNode(results[0]); // Selección automática
+                Swal.fire({
+                  title: 'Nodo encontrado con exito!',
+                  text: `Se ha encontrado ${results[0].name} - ${results[0].attributes.code}, acontinuación puede realizar sus respectivas operaciones.`,
+                  icon: 'success',
+                  confirmButtonText: 'Okay',
+                });
+              } else {
+                Swal.fire({
+                  title: 'Nodos encontrados con exito!',
+                  text: `Se ha encontrado los nodos que coinciden con la busqueda, acontinuación elija uno para realizar sus respectivas operaciones.`,
+                  icon: 'success',
+                  confirmButtonText: 'Okay',
+                });
               }
-
-              console.log(`Nodos con temp media >= ${minAvgTemp}:`, results);
+              setTemp('');
             }}
           >
             Buscar por temperatura media
           </Button>
 
-          {/* Recorrido por niveles */}
-          <Separator text="Recorrido" />
-          <Button
-            onClick={() => levelWalkthrough(treeData)}
-            variant="primary"
-            className="col-span-2"
-          >
-            Hacer Recorrido Por Niveles
-          </Button>
-
-          <Separator text="Operaciones sobre nodo seleccionado" />
-
           {searchResults.length > 0 && (
             <select
-              className="col-span-2 rounded bg-white p-2 text-black"
+              className="bg-accent col-span-2 cursor-pointer rounded p-2 text-xs font-bold text-gray-300 transition-all duration-150 ease-in outline-none hover:scale-103"
               value={selectedNode?.attributes.code || ''}
               onChange={(e) => {
                 const selected = searchResults.find(
                   (n) => n.attributes.code === e.target.value
                 );
                 setSelectedNode(selected || null);
+                setNodeInfo('');
               }}
             >
               <option value="">Seleccionar nodo</option>
@@ -350,79 +293,225 @@ export default function Home() {
             </select>
           )}
 
-          {selectedNode ? (
+          {selectedNode && (
             <>
+              <Separator text="Operaciones disponibles" />
               <Button
-                className="col-span-2"
+                className="col-span-1"
+                variant="secondary"
                 onClick={() => {
                   const nivel = getNodeLevel(treeData, selectedNode);
+                  setNodeInfo(`Nivel del nodo: ${nivel}`);
                   console.log(
                     `Nivel del nodo ${selectedNode.name} (${selectedNode.attributes.code}, temp=${selectedNode.attributes.avegTemp.toFixed(4)}): ${nivel}`
                   );
                 }}
               >
-                a. Nivel
+                Nivel
               </Button>
 
               <Button
+                className="col-span-1"
+                onClick={() => {
+                  const padre = getParent(treeData, selectedNode);
+                  setNodeInfo(
+                    `Nodo padre: ${padre?.name} - ${padre?.attributes.code}`
+                  );
+                  formatNodeInfo(padre, 'Padre', selectedNode);
+                }}
+              >
+                Padre
+              </Button>
+
+              <Button
+                className="col-span-1"
+                onClick={() => {
+                  const abuelo = getGrandparent(treeData, selectedNode);
+                  setNodeInfo(
+                    `Nodo abuelo: ${abuelo?.name} - ${abuelo?.attributes.code}`
+                  );
+                  formatNodeInfo(abuelo, 'Abuelo', selectedNode);
+                }}
+              >
+                Abuelo
+              </Button>
+
+              <Button
+                className="col-span-1"
+                variant="secondary"
+                onClick={() => {
+                  const tio = getUncle(treeData, selectedNode);
+                  setNodeInfo(
+                    `Nodo tio: ${tio?.name} - ${tio?.attributes.code}`
+                  );
+                  formatNodeInfo(tio, 'Tío', selectedNode);
+                }}
+              >
+                Tío
+              </Button>
+              <Button
                 className="col-span-2"
+                variant="secondary"
                 onClick={() => {
                   const balance = getBalance(selectedNode);
+                  setNodeInfo(`Factor de balance: ${balance}`);
                   console.log(
                     `Balance del nodo ${selectedNode.name} (${selectedNode.attributes.code}, temp=${selectedNode.attributes.avegTemp.toFixed(4)}): ${balance}`
                   );
                 }}
               >
-                b. Balance
+                Factor de balanceo
               </Button>
-
-              <Button
-                className="col-span-2"
-                onClick={() => {
-                  const padre = getParent(treeData, selectedNode);
-                  formatNodeInfo(padre, 'Padre', selectedNode);
-                }}
-              >
-                c. Padre
-              </Button>
-
-              <Button
-                className="col-span-2"
-                onClick={() => {
-                  const abuelo = getGrandparent(treeData, selectedNode);
-                  formatNodeInfo(abuelo, 'Abuelo', selectedNode);
-                }}
-              >
-                d. Abuelo
-              </Button>
-
-              <Button
-                className="col-span-2"
-                onClick={() => {
-                  const tio = getUncle(treeData, selectedNode);
-                  formatNodeInfo(tio, 'Tío', selectedNode);
-                }}
-              >
-                e. Tío
-              </Button>
+              <p className="col-span-2 px-5 text-center text-xs font-bold break-words">
+                {nodeInfo !== '' ? nodeInfo : '...'}
+              </p>
             </>
-          ) : (
-            <div className="col-span-2 text-sm font-medium text-red-600">
-              No hay nodo seleccionado para operar.
-            </div>
           )}
 
-          {/* Configuraciones visuales */}
-          <Separator text="Configuraciones visuales" />
-          <DecimalSlider
-            className="col-span-2"
-            label="Profundidad de los nodos"
+          <Separator text="Búsqueda por temperatura promedio de año" />
+
+          <Input
+            className="col-span-2 md:col-span-2"
+            label="Año"
+            type="number"
+            value={searchYear}
+            placeholder="2022"
+            onChange={(e) => setSearchYear(e.target.value)}
+            max={2022}
+            min={1961}
+            maxLength={5}
           />
-          <DecimalSlider className="col-span-2" label="Distancia entre nodos" />
+
+          <Button
+            className="col-span-1"
+            onClick={() => {
+              const year = Number(searchYear);
+              if (searchYear === '' || year < 1961 || year > 2022) {
+                Swal.fire({
+                  title: 'Fecha no valida',
+                  text: `Opps... La fecha que has ingresado no es valida, el rango permitido es de 1961 a 2022, intenta nuevamente!`,
+                  icon: 'warning',
+                  confirmButtonText: 'Okay',
+                });
+                return;
+              }
+
+              const results = searchBelowGlobalAverage(treeData, Number(year));
+              if (results.length === 1) {
+                setSelectedNode(results[0]); // Selección automática
+              }
+
+              setSearchResults(results);
+              setSelectedNode(null); // Limpia selección previa
+
+              let newTreeRoot: TreeNode | null = null;
+
+              results.forEach((node) => {
+                const newNode: TreeNode = {
+                  name: node.name,
+                  attributes: {
+                    avegTemp: node.attributes.avegTemp,
+                    code: node.attributes.code,
+                    flag: node.attributes.flag,
+                    height: node.attributes.height,
+                    tempStr: node.attributes.tempStr,
+                  },
+                  children: [{ name: '' }, { name: '' }],
+                };
+
+                newTreeRoot = insert(newTreeRoot, newNode);
+                console.log(newNode);
+              });
+              setDisplayTreeData(newTreeRoot!);
+            }}
+          >
+            Menor al promedio global
+          </Button>
+
+          <Button
+            variant="secondary"
+            className="col-span-1"
+            onClick={() => {
+              const year = Number(searchYear);
+              if (searchYear === '' || year < 1961 || year > 2022) {
+                Swal.fire({
+                  title: 'Fecha no valida',
+                  text: `Opps... La fecha que has ingresado no es valida, el rango permitido es de 1961 a 2022, intenta nuevamente!`,
+                  icon: 'warning',
+                  confirmButtonText: 'Okay',
+                });
+                return;
+              }
+
+              const results = searchAboveYearAverage(
+                treeData,
+                Number(searchYear)
+              );
+
+              if (results.length === 1) {
+                setSelectedNode(results[0]); // Selección automática
+              }
+
+              setSearchResults(results);
+              setSelectedNode(null); // Limpia selección previa
+
+              let newTreeRoot: TreeNode | null = null;
+
+              results.forEach((node) => {
+                const newNode: TreeNode = {
+                  name: node.name,
+                  attributes: {
+                    avegTemp: node.attributes.avegTemp,
+                    code: node.attributes.code,
+                    flag: node.attributes.flag,
+                    height: node.attributes.height,
+                    tempStr: node.attributes.tempStr,
+                  },
+                  children: [{ name: '' }, { name: '' }],
+                };
+
+                newTreeRoot = insert(newTreeRoot, newNode);
+                console.log(newNode);
+                console.log(node);
+              });
+
+              setDisplayTreeData(newTreeRoot!);
+            }}
+          >
+            Mayor al promedio del año
+          </Button>
+
+          <Separator text="Operaciones con el arbol" />
+          <Button
+            onClick={() => levelWalkthrough(treeData)}
+            variant="primary"
+            className="col-span-2"
+          >
+            Hacer Recorrido Por Niveles
+          </Button>
+
+          <Button
+            className="col-span-2"
+            onClick={() => {
+              setDisplayTreeData(treeData);
+              Swal.fire({
+                title: 'Arbol reiniciado!',
+                text: `El arbol ha sido reiniciado con los datos por defecto!`,
+                icon: 'success',
+                confirmButtonText: 'Okay',
+              });
+            }}
+            variant="secondary"
+          >
+            Reiniciar arbol
+          </Button>
         </div>
 
         {/* Visualización del árbol */}
-        <DynamicAVLTree key={JSON.stringify(treeData)} data={treeData} />
+        <DynamicAVLTree
+          key={JSON.stringify(displayTreeData)}
+          data={displayTreeData}
+        />
       </div>
     </>
   );

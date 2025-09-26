@@ -49,12 +49,13 @@ function levelWalkthrough(data: TreeNode): void {
 
 function searchNodeByAverageTemperature(data: TreeNode, avgTemp: number): void {
   const node = findNodeByTemp(data, avgTemp);
-  if (node) {
-    console.log(
-      `Nodo encontrado: ${node.name} (${node.attributes.code}, temp=${avgTemp})`
-    );
-  } else {
-    console.log(`No se encontró ningún nodo con temp=${avgTemp}`);
+  if (!node) {
+    Swal.fire({
+      title: 'Nodo no encontrado...',
+      text: `Opps... Parece que no se encontro ningun nodo con dicha temperatura, intenta nuevamente!`,
+      icon: 'error',
+      confirmButtonText: 'Okay',
+    });
   }
 }
 
@@ -62,26 +63,32 @@ function deleteCountry(
   data: TreeNode,
   temp: number,
   setTreeData: Function,
-  setTemp: Function
+  setTemp: Function,
+  setDisplayTreeData: Function
 ): void {
   const nodeToDelete = findNodeByTemp(data, temp);
 
   if (!nodeToDelete) {
-    const msg = `No se encontró ningún nodo con temp=${temp.toFixed(5)}`;
-    console.log(msg);
+    Swal.fire({
+      title: 'Nodo no encontrado...',
+      text: `Opps... Parece que no se encontro ningun nodo con dicha temperatura, intenta nuevamente!`,
+      icon: 'error',
+      confirmButtonText: 'Okay',
+    });
     return;
   }
   Swal.fire({
     title: 'Nodo eliminado con exito!',
-    text: 'Do you want to continue',
+    text: `El nodo ${nodeToDelete.name} - ${nodeToDelete.attributes.code} ha sido eliminado correctamente`,
     icon: 'success',
-    confirmButtonText: 'Cool',
+    confirmButtonText: 'Okay',
   });
 
   const msg = `Nodo eliminado: ${nodeToDelete.name} (${nodeToDelete.attributes.code}, temp=${nodeToDelete.attributes.avegTemp.toFixed(5)})`;
   console.log(msg);
   const updatedTree = deleteNode(data, temp);
   setTreeData(updatedTree! as TreeNode);
+  setDisplayTreeData(updatedTree);
 
   setTemp('');
 }
