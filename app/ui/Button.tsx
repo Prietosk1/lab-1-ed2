@@ -12,7 +12,7 @@ export default function Button({
   // Dependiendo del variant, aplicamos diferentes clases
   const variantClasses =
     variant === 'primary'
-      ? 'bg-accent text-foreground hover:bg-accent-hover hover:scale-[1.02] active:bg-mask'
+      ? 'bg-accent text-gray-300 hover:bg-accent-hover hover:scale-[1.02] active:bg-mask'
       : 'bg-secondary text-accent hover:bg-secondary-hover active:bg-background active:text-secondary-hover';
 
   return (

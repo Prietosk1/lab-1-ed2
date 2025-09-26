@@ -50,7 +50,19 @@ export default function Home() {
         <div className="bg-mask scrollbar-thin scrollbar-thumb-blue scrollbar-track-gray grid w-full auto-rows-min grid-cols-4 gap-3 overflow-auto rounded p-4 md:w-92 md:grid-cols-2">
           <Logo />
           {/* Inserccion */}
-          <Separator text="Inserción" />
+          <Separator text="Inserción de pais" />
+          <Input
+            label="Nombre"
+            type="text"
+            className="col-span-2 md:col-span-1"
+            placeholder="Colombia"
+          />
+          <Input
+            label="Temperatura media"
+            className="col-span-2 md:col-span-1"
+            type="number"
+            placeholder="0.723"
+          />
           <Button className="col-span-4 md:col-span-2">Agregar nodo</Button>
           <Separator text="Eliminación y busqueda de nodo por metrica" />
           <Input
