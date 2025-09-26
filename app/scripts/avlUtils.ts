@@ -1,10 +1,15 @@
-import { TreeNode } from '@/app/types/treeNode';
+import { EmptyTreeNode, TreeNode } from '@/app/types/treeNode';
 import Tree from 'react-d3-tree';
+
+// Verifica si un nodo es vacío
+function isEmpty(node: TreeNode | null): boolean {
+  return !node || node.name === '';
+}
 
 // Retorna la altura almacenada en el nodo, o 1 si no está definida
 function getHeight(node: TreeNode): number {
-  if (!node || node.name === '') return 0; // Si no existe el nodo, su altura es 0
-  return node.attributes.height ?? 1;
+  if (isEmpty(node)) return 0; // Si no existe el nodo, su altura es 0
+  return node.attributes.height;
 }
 
 // Actualiza la altura del nodo basado en las alturas de sus hijos
@@ -49,45 +54,44 @@ function rotateLeft(node: TreeNode): TreeNode {
   return right;
 }
 
-// Verifica si un nodo es vacío
-function isEmpty(node: TreeNode) {
-  return !node || node.name === '';
-}
-
-// RECORRIDO POR NIVELES
 // Recorrido por niveles (recursivo)
-function getLevelOrderRecursive(root: TreeNode): string[][] {
+function getLevelOrderRecursive(node: TreeNode): string[][] {
   const result: string[][] = [];
-  const h = getHeight(root); // altura del árbol
 
   // Para cada nivel, recolectamos los nodos
-  for (let i = 1; i <= h; i++) {
-    const level: string[] = [];
-    collectLevel(root, i, level);
-    result.push(level);
+  for (let i = 1; i <= getHeight(node); i++) {
+    const countries: string[] = [];
+    getCountriesISO3(node, i, countries);
+    result.push(countries);
   }
 
   return result;
 }
 
 // Función auxiliar recursiva que recolecta nodos de un nivel específico
-function collectLevel(node: TreeNode, level: number, acc: string[]): void {
+function getCountriesISO3(
+  node: TreeNode,
+  level: number,
+  countries: string[]
+): void {
   if (isEmpty(node)) return;
 
   if (level === 1) {
-    acc.push(node.attributes.code); // ISO3 del país
+    countries.push(node.attributes.code); // ISO3 del país
   } else {
-    collectLevel(node.children[0] as TreeNode, level - 1, acc);
-    collectLevel(node.children[1] as TreeNode, level - 1, acc);
+    console.log(node.attributes.avegTemp + '\n');
+    getCountriesISO3(node.children[0] as TreeNode, level - 1, countries);
+    getCountriesISO3(node.children[1] as TreeNode, level - 1, countries);
   }
 }
 
+// Insertar un nuevo nodo en el árbol AVL
 function insert(node: TreeNode | null, newNode: TreeNode): TreeNode {
   if (!node || node.name === '') return newNode; // Si el nodo hijo esta vacio, se retornar el nuevo nodo para insertarlo
 
   // Obtenemos las temperaturas para compararlas
-  const newNodeTemp = newNode.attributes.temp;
-  const nodeTemp = node.attributes.temp;
+  const newNodeTemp = newNode.attributes.avegTemp;
+  const nodeTemp = node.attributes.avegTemp;
 
   if (newNodeTemp < nodeTemp) {
     node.children[0] = insert(node.children[0] as TreeNode, newNode); // Seguira por la izquierda
@@ -105,7 +109,7 @@ function insert(node: TreeNode | null, newNode: TreeNode): TreeNode {
   // Caso Izquierda Izquierda
   if (
     balance < -1 && // Verifica que el nodo esté desbalanceado a la izquierda
-    newNodeTemp < (node.children[0] as TreeNode).attributes.temp // Verifica que el nuevo nodo es menor que el hijo izquierdo
+    newNodeTemp < (node.children[0] as TreeNode).attributes.avegTemp // Verifica que el nuevo nodo es menor que el hijo izquierdo
   ) {
     return rotateRight(node);
   }
@@ -113,7 +117,7 @@ function insert(node: TreeNode | null, newNode: TreeNode): TreeNode {
   // Caso Derecha Derecha
   if (
     balance > 1 && // Verifica que el nodo esté desbalanceado a la derecha
-    newNodeTemp > (node.children[1] as TreeNode).attributes.temp // Verifica que el nuevo nodo es mayor que el hijo derecho
+    newNodeTemp > (node.children[1] as TreeNode).attributes.avegTemp // Verifica que el nuevo nodo es mayor que el hijo derecho
   ) {
     return rotateLeft(node);
   }
@@ -121,7 +125,7 @@ function insert(node: TreeNode | null, newNode: TreeNode): TreeNode {
   // Caso Izquierda Derecha
   if (
     balance < -1 && // Verifica que el nodo esté desbalanceado a la izquierda
-    newNodeTemp > (node.children[0] as TreeNode).attributes.temp // Verifica que el nuevo nodo es mayor que el hijo izquierdo
+    newNodeTemp > (node.children[0] as TreeNode).attributes.avegTemp // Verifica que el nuevo nodo es mayor que el hijo izquierdo
   ) {
     node.children[0] = rotateLeft(node.children[0] as TreeNode);
     return rotateRight(node);
@@ -130,7 +134,7 @@ function insert(node: TreeNode | null, newNode: TreeNode): TreeNode {
   // Caso Derecha Izquierda
   if (
     balance > 1 && // Verifica que el nodo esté desbalanceado a la derecha
-    newNodeTemp < (node.children[1] as TreeNode).attributes.temp // Verifica que el nuevo nodo es menor que el hijo derecho
+    newNodeTemp < (node.children[1] as TreeNode).attributes.avegTemp // Verifica que el nuevo nodo es menor que el hijo derecho
   ) {
     node.children[1] = rotateRight(node.children[1] as TreeNode);
     return rotateLeft(node);
@@ -156,7 +160,6 @@ function getNodeLevel(
 
 // b. Obtener el factor de balanceo
 
-// Calcula el factor de balance del nodo
 function getBalance(node: TreeNode): number {
   return (
     getHeight(node.children[1] as TreeNode) -
@@ -203,11 +206,13 @@ function getUncle(root: TreeNode, target: TreeNode): TreeNode | null {
       : (grandparent.children[0] as TreeNode);
   }
 }
-function deleteNode(root: TreeNode, temp: number): TreeNode {
+
+// Eliminar un nodo por su cambio de temperatura promedio
+function deleteNode(root: TreeNode, temp: number): TreeNode | EmptyTreeNode {
   if (!root || isEmpty(root)) return createEmptyNode();
 
-  const targetTemp = Number(temp.toFixed(4));
-  const nodeTemp = Number(root.attributes.temp.toFixed(4));
+  const targetTemp = Number(temp.toFixed(5));
+  const nodeTemp = Number(root.attributes.avegTemp.toFixed(5));
 
   // Buscar el nodo a eliminar
   if (targetTemp < nodeTemp) {
@@ -239,7 +244,7 @@ function deleteNode(root: TreeNode, temp: number): TreeNode {
     root.attributes = successor.attributes;
 
     // Eliminar el sucesor
-    root.children[1] = deleteNode(right, successor.attributes.temp);
+    root.children[1] = deleteNode(right, successor.attributes.avegTemp);
   }
 
   // Actualizar altura y balancear
@@ -267,17 +272,9 @@ function deleteNode(root: TreeNode, temp: number): TreeNode {
 
   return root;
 }
-function createEmptyNode(): TreeNode {
+function createEmptyNode(): EmptyTreeNode {
   return {
     name: '',
-    attributes: {
-      temp: 0,
-      tempStr: '0.0000°C',
-      code: '',
-      flag: null,
-      height: 1,
-    },
-    children: [{ name: '' }, { name: '' }],
   };
 }
 
@@ -285,8 +282,8 @@ function findNodeByTemp(root: TreeNode, temp: number): TreeNode | null {
   if (isEmpty(root)) return null;
 
   // Redondear ambos valores a 4 decimales
-  const nodeTemp = Number(root.attributes.temp.toFixed(4));
-  const targetTemp = Number(temp.toFixed(4));
+  const nodeTemp = Number(root.attributes.avegTemp.toFixed(5));
+  const targetTemp = Number(temp.toFixed(5));
 
   if (nodeTemp === targetTemp) return root;
 

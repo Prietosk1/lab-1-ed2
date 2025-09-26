@@ -4,7 +4,7 @@ import dataset from '@/app/data/dataset_climate_change.json';
 import { insert } from '@/app/scripts/avlUtils';
 
 function generateTreeData(): TreeNode {
-  const countries: CountryData[] = dataset as CountryData[];
+  const countries: CountryData[] = dataset;
 
   let root: TreeNode | null = null;
 
@@ -12,8 +12,8 @@ function generateTreeData(): TreeNode {
     const node: TreeNode = {
       name: country.name,
       attributes: {
-        temp: country.avgTempChange,
-        tempStr: country.avgTempChange.toFixed(4) + '°C',
+        avegTemp: country.avgTempChange,
+        tempStr: country.avgTempChange.toFixed(5) + '°C',
         code: country.code,
         flag: country.flag,
         height: 1,

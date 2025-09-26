@@ -49,7 +49,7 @@ function searchBelowGlobalAverage(root: TreeNode, year: number): TreeNode[] {
 
 function searchByMinAvgTemp(root: TreeNode, min: number): TreeNode[] {
   return getAllNodes(root).filter(
-    (node) => node.attributes.temp >= Number(min.toFixed(6))
+    (node) => node.attributes.avegTemp >= Number(min.toFixed(6))
   );
 }
 

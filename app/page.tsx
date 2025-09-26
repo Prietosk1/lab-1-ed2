@@ -19,7 +19,7 @@ import {
   insert,
 } from './scripts/avlUtils';
 import { generateTreeData } from './scripts/generateTreeData';
-import { levelWalkthrough } from './scripts/buttonUtils';
+import { deleteCountry, levelWalkthrough } from './scripts/buttonUtils';
 import dataset from '@/app/data/dataset_climate_change.json';
 import { CountryData } from './types/countryData';
 import {
@@ -27,6 +27,7 @@ import {
   searchBelowGlobalAverage,
   searchByMinAvgTemp,
 } from './scripts/searchUtils';
+import Swal from 'sweetalert2';
 
 const DynamicAVLTree = dynamic(() => import('@/app/ui/AVLTree'), {
   ssr: false,
@@ -39,12 +40,12 @@ function formatNodeInfo(
 ) {
   if (!relative) {
     console.log(
-      `${label} del nodo ${original.name} (${original.attributes.code}, temp=${original.attributes.temp}): Ninguno`
+      `${label} del nodo ${original.name} (${original.attributes.code}, temp=${original.attributes.avegTemp}): Ninguno`
     );
   } else {
     console.log(
-      `${label} del nodo ${original.name} (${original.attributes.code}, temp=${original.attributes.temp}): ` +
-        `${relative.name} (${relative.attributes.code}, temp=${relative.attributes.temp})`
+      `${label} del nodo ${original.name} (${original.attributes.code}, temp=${original.attributes.avegTemp}): ` +
+        `${relative.name} (${relative.attributes.code}, temp=${relative.attributes.avegTemp})`
     );
   }
 }
@@ -148,7 +149,7 @@ export default function Home() {
               const newNode: TreeNode = {
                 name: match.name,
                 attributes: {
-                  temp: match.avgTempChange,
+                  avegTemp: match.avgTempChange,
                   tempStr: match.avgTempChange.toFixed(4) + '°C',
                   code: match.code,
                   flag: match.flag,
@@ -161,7 +162,7 @@ export default function Home() {
               setTreeData(updatedTree);
 
               console.log(
-                `Nodo agregado: ${newNode.name} (${newNode.attributes.code}, temp=${newNode.attributes.temp.toFixed(4)})`
+                `Nodo agregado: ${newNode.name} (${newNode.attributes.code}, temp=${newNode.attributes.avegTemp.toFixed(4)})`
               );
 
               setNewNameOrCode('');
@@ -188,7 +189,7 @@ export default function Home() {
                 setSearchResults([node]); // Solo ese nodo en el combo
                 setSelectedNode(node); // Selección automática
                 console.log(
-                  `Nodo encontrado: ${node.name} (${node.attributes.code}, temp=${node.attributes.temp.toFixed(4)})`
+                  `Nodo encontrado: ${node.name} (${node.attributes.code}, temp=${node.attributes.avegTemp.toFixed(4)})`
                 );
               } else {
                 setSearchResults([]);
@@ -208,21 +209,30 @@ export default function Home() {
           <Button
             className="col-span-1"
             onClick={() => {
+              // deleteCountry(treeData, Number(temp), setTreeData);
               const tempValue = Number(temp);
               const nodeToDelete = findNodeByTemp(treeData, tempValue);
 
               if (!nodeToDelete) {
-                const msg = `No se encontró ningún nodo con temp=${tempValue.toFixed(4)}`;
+                const msg = `No se encontró ningún nodo con temp=${tempValue.toFixed(5)}`;
                 console.log(msg);
                 setDeletedMessage(msg);
                 return;
               }
-              const msg = `Nodo eliminado: ${nodeToDelete.name} (${nodeToDelete.attributes.code}, temp=${nodeToDelete.attributes.temp.toFixed(4)})`;
+              Swal.fire({
+                title: 'Nodo eliminado con exito!',
+                text: 'Do you want to continue',
+                icon: 'success',
+                confirmButtonText: 'Cool',
+              });
+
+              const msg = `Nodo eliminado: ${nodeToDelete.name} (${nodeToDelete.attributes.code}, temp=${nodeToDelete.attributes.avegTemp.toFixed(5)})`;
               console.log(msg);
               const updatedTree = deleteNode(treeData, tempValue);
-              setTreeData(updatedTree!);
+              setTreeData(updatedTree! as TreeNode);
+              setTreeData(treeData);
 
-              setDeletedMessage(msg);
+              setTemp('');
             }}
           >
             Eliminar
@@ -347,7 +357,7 @@ export default function Home() {
                 onClick={() => {
                   const nivel = getNodeLevel(treeData, selectedNode);
                   console.log(
-                    `Nivel del nodo ${selectedNode.name} (${selectedNode.attributes.code}, temp=${selectedNode.attributes.temp.toFixed(4)}): ${nivel}`
+                    `Nivel del nodo ${selectedNode.name} (${selectedNode.attributes.code}, temp=${selectedNode.attributes.avegTemp.toFixed(4)}): ${nivel}`
                   );
                 }}
               >
@@ -359,7 +369,7 @@ export default function Home() {
                 onClick={() => {
                   const balance = getBalance(selectedNode);
                   console.log(
-                    `Balance del nodo ${selectedNode.name} (${selectedNode.attributes.code}, temp=${selectedNode.attributes.temp.toFixed(4)}): ${balance}`
+                    `Balance del nodo ${selectedNode.name} (${selectedNode.attributes.code}, temp=${selectedNode.attributes.avegTemp.toFixed(4)}): ${balance}`
                   );
                 }}
               >
