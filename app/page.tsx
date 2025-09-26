@@ -136,7 +136,7 @@ export default function Home() {
                   } while (findNodeByTemp(treeData, avg));
 
                   const newId = Math.max(...countries.map((c) => c.id)) + 1;
-                  const newCode = input.slice(0, 3).toUpperCase();
+                  const newCode = input.slice(0, 4).toUpperCase();
 
                   return {
                     id: newId,
@@ -158,7 +158,7 @@ export default function Home() {
               // Verificar que el promedio no exista en el árbol (por si el país sí existía)
               if (findNodeByTemp(treeData, match.avgTempChange)) {
                 console.log(
-                  `Ya existe un nodo con temp=${match.avgTempChange.toFixed(4)}. No se puede insertar duplicado.`
+                  `Ya existe un nodo con temp=${match.avgTempChange.toFixed(5)}. No se puede insertar duplicado.`
                 );
                 return;
               }
@@ -167,7 +167,7 @@ export default function Home() {
                 name: match.name,
                 attributes: {
                   avegTemp: match.avgTempChange,
-                  tempStr: match.avgTempChange.toFixed(4) + '°C',
+                  tempStr: match.avgTempChange.toFixed(5) + '°C',
                   code: match.code,
                   flag: match.flag,
                   height: 1,
@@ -180,7 +180,7 @@ export default function Home() {
               setDisplayTreeData(updatedTree);
 
               console.log(
-                `Nodo agregado: ${newNode.name} (${newNode.attributes.code}, temp=${newNode.attributes.avegTemp.toFixed(4)})`
+                `Nodo agregado: ${newNode.name} (${newNode.attributes.code}, temp=${newNode.attributes.avegTemp.toFixed(5)})`
               );
 
               setNewNameOrCode('');
@@ -518,7 +518,7 @@ export default function Home() {
 
           {nivelesRecorrido.map((row, rowIndex) => (
             <div key={rowIndex} className="col-span-2 mb-4">
-              <p className="text-accent font-semibold">Nivel {rowIndex + 1}</p>
+              <p className="text-accent font-semibold">Nivel {rowIndex}</p>
               <div className="grid grid-cols-5 items-center justify-center">
                 {row.map((col, colIndex) => {
                   const iso2 = iso.whereAlpha3(col)?.alpha2?.toLowerCase();
