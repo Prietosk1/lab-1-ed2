@@ -3,8 +3,8 @@ import { geistMono, geistSans } from '@/app/ui/fonts';
 import '@/app/globals.css';
 
 export const metadata: Metadata = {
-  title: 'Lab 1',
-  description: 'Lab 1 de Estructura de datos 2',
+  title: 'Treematric',
+  description: 'Visualizador de datos de cambios de tempraturas de paises',
 };
 
 export default function RootLayout({
