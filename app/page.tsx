@@ -50,6 +50,7 @@ export default function Home() {
   const [deletedMessage, setDeletedMessage] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
   const [newTemp, setNewTemp] = useState('');
+  const [newNameOrCode, setNewNameOrCode] = useState('');
 
   return (
     <>
@@ -59,41 +60,58 @@ export default function Home() {
           {/* Inserccion */}
           <Separator text="Inserción de pais" />
           <Input
-            label="Nombre"
+            label="Nombre o código ISO"
             type="text"
-            className="col-span-2 md:col-span-1"
-            placeholder="Colombia"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
+            className="col-span-2"
+            placeholder="Colombia o COL"
+            value={newNameOrCode}
+            onChange={(e) => setNewNameOrCode(e.target.value)}
           />
 
-          <Input
-            label="Temperatura media"
-            className="col-span-2 md:col-span-1"
-            type="number"
-            placeholder="0.723"
-            value={newTemp}
-            onChange={(e) => setNewTemp(e.target.value)}
-          />
           <Button
-            className="col-span-4 md:col-span-2"
+            className="col-span-1 md:col-span-2"
             onClick={() => {
-              const name = newName.trim().toLowerCase();
-              if (!name) {
-                console.log('Nombre inválido');
+              const input = newNameOrCode.trim().toLowerCase();
+              if (!input) {
+                console.log('Entrada inválida');
                 return;
               }
 
               const countries: CountryData[] = dataset as CountryData[];
-              const match = countries.find(
-                (c) => c.name.trim().toLowerCase() === name
+              let match = countries.find(
+                (c) =>
+                  c.name.trim().toLowerCase() === input ||
+                  c.code.trim().toLowerCase() === input
               );
 
               if (!match) {
-                console.log(
-                  `No se encontró el país "${newName}" en el conjunto de datos`
+                // Generar país nuevo
+                const randomTemps = Array.from({ length: 62 }, () =>
+                  Number((Math.random() * 2 - 1).toFixed(3))
                 );
-                return;
+                const avg = Number(
+                  (
+                    randomTemps.reduce((sum, t) => sum + t, 0) /
+                    randomTemps.length
+                  ).toFixed(6)
+                );
+
+                const newId = Math.max(...countries.map((c) => c.id)) + 1;
+                const newCode = input.slice(0, 3).toUpperCase();
+
+                match = {
+                  id: newId,
+                  name: input.charAt(0).toUpperCase() + input.slice(1),
+                  code: newCode,
+                  temperatures: randomTemps,
+                  flag: '',
+                  avgTempChange: avg,
+                };
+
+                countries.push(match); // Simulado: en memoria
+                console.log(
+                  `Nuevo país generado: ${match.name} (${match.code})`
+                );
               }
 
               const newNode: TreeNode = {
@@ -112,11 +130,10 @@ export default function Home() {
               setTreeData(updatedTree);
 
               console.log(
-                `Nodo agregado desde dataset: ${newNode.name} (${newNode.attributes.code}, temp=${newNode.attributes.temp.toFixed(4)})`
+                `Nodo agregado: ${newNode.name} (${newNode.attributes.code}, temp=${newNode.attributes.temp.toFixed(4)})`
               );
 
-              setNewName('');
-              setNewTemp('');
+              setNewNameOrCode('');
             }}
           >
             Agregar nodo
