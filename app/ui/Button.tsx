@@ -6,7 +6,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 export default function Button({
   variant = 'primary',
   className = '',
-  onClick = () => console.log('Soy un boton'),
+  onClick,
   ...props
 }: ButtonProps) {
   // Dependiendo del variant, aplicamos diferentes clases
@@ -19,6 +19,7 @@ export default function Button({
     <button
       className={`cursor-pointer rounded px-4 py-2 font-sans text-xs font-bold transition-all duration-150 ease-in hover:scale-103 ${variantClasses} ${className}`}
       onClick={onClick}
+      type="button"
       {...props}
     />
   );
