@@ -1,3 +1,9 @@
+import MapView from '@/app/ui/MapView';
+
 export default function page() {
-  return <p>Holaaa</p>;
+  return (
+    <div className="flex h-screen w-screen justify-center align-middle">
+      <MapView />
+    </div>
+  );
 }
