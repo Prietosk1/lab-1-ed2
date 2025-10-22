@@ -3,7 +3,7 @@ import getTempColor from '@/app/scripts/getColor';
 
 export default function CustomNode({ nodeDatum }: CustomNodeElementProps) {
   const flag = nodeDatum.attributes?.flag;
-  const temp = nodeDatum.attributes?.temp ?? 0; // asumir que tienes temp numérico
+  const temp = nodeDatum.attributes?.avegTemp ?? 0; // asumir que tienes temp numérico
   const color = getTempColor(temp as number);
 
   if (nodeDatum.name === '') {

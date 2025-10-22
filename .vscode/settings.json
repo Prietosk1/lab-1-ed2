@@ -16,7 +16,7 @@
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "cSpell.words": ["logomark", "papaparse", "turbopack"],
+  "cSpell.words": ["Anual", "aveg", "logomark", "papaparse", "turbopack"],
   "cSpell.language": "en,es",
   "cSpell.enabledFileTypes": {
     ".js": true,

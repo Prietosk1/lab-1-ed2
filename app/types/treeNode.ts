@@ -1,7 +1,7 @@
 export type TreeNode = {
   name: string;
   attributes: {
-    temp: number;
+    avegTemp: number;
     tempStr: string;
     code: string;
     flag: string | null;
@@ -10,4 +10,4 @@ export type TreeNode = {
   children: [left: TreeNode | EmptyTreeNode, right: TreeNode | EmptyTreeNode];
 };
 
-type EmptyTreeNode = { name: '' };
+export type EmptyTreeNode = { name: '' };
