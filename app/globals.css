@@ -39,6 +39,13 @@
   }
 }
 
+@font-face {
+  font-family: 'Treematric';
+  src: url('/public/fonts/Treematic.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
